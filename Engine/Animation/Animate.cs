@@ -6,14 +6,14 @@ namespace Canvaz.Engine.Animation;
 
 public static class Animate
 {
-    public static AnimationState Value(float from, float to, float time)
-        => new([from], [to], time);
+    public static AnimationState Value(float from, float to, float time, EasingType easingType = EasingType.Linear)
+        => new([from], [to], time, easingType);
 
-    public static AnimationState Vector2f(Vector2f from, Vector2f to, float time)
-        => new([from.X, from.Y], [to.X, to.Y], time);
+    public static AnimationState Vector2f(Vector2f from, Vector2f to, float time, EasingType easingType = EasingType.Linear)
+        => new([from.X, from.Y], [to.X, to.Y], time, easingType);
 
-    public static AnimationState Color(Color from, Color to, float time)
-        => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time);
+    public static AnimationState Color(Color from, Color to, float time, EasingType easingType = EasingType.Linear)
+        => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easingType);
 }
 
 
