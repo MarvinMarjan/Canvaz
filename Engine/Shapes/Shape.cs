@@ -15,13 +15,38 @@ public abstract class ShapeObject : Object
     /// </summary>
     public Shape SFShape { get; set; }
 
-    public Vector2f Position => SFShape.Position;
-    public float Rotation => SFShape.Rotation;
 
-    public float BorderSize => SFShape.OutlineThickness;
+    public Vector2f Position
+    {
+        get => SFShape.Position;
+        set => SFShape.Position = value;
+    }
 
-    public Color Color => SFShape.FillColor;
-    public Color BorderColor => SFShape.OutlineColor;
+    public float Rotation
+    {
+        get => SFShape.Rotation;
+        set => SFShape.Rotation = value;
+    }
+
+
+    public float BorderSize 
+    {
+        get => SFShape.OutlineThickness;
+        set => SFShape.OutlineThickness = value;
+    }
+
+
+    public Color Color
+    {
+        get => SFShape.FillColor;
+        set => SFShape.FillColor = value;
+    }
+
+    public Color BorderColor
+    {
+        get => SFShape.OutlineColor;
+        set => SFShape.OutlineColor = value;
+    }
 
 
     public ShapeObject(Shape SFShape, Vector2f position)
@@ -37,5 +62,11 @@ public abstract class ShapeObject : Object
             return;
 
         renderWindow.Draw(SFShape);
+    }
+
+
+    public override void Update()
+    {
+        
     }
 }

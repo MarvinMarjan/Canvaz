@@ -1,6 +1,5 @@
-using SFML.Window;
-using SFML.Graphics;
-
+using Canvaz.Engine;
+using Canvaz.Engine.Animation;
 using Canvaz.Engine.Shapes;
 
 
@@ -11,23 +10,40 @@ public class CanvazApp
 {
     public static void Main(string[] args)
     {
-        RenderWindow window = new(VideoMode.DesktopMode, "Canvaz");
-        window.Closed += (_, _) => window.Close();
+        EngineApp manager = new("Canvaz", new() {
+            AntialiasingLevel = 3
+        });
 
-        Polygon polygon = new([
-            new(100, 100), new(200, 150),
-            new(300, 400), new(100, 300),
-            new(50, 50)
-        ]);
+        Rectangle rect = new(new(300, 300), new(100, 100));
+        Circle circle = new(new(900, 500), 10f);
+        circle.SFShape.SetPointCount(300);
 
-        while (window.IsOpen)
+        AnimationState animation1 = Animate.Vector2f(rect.Position, new(500, 500), 2f);
+        AnimationState animation2 = Animate.Color(rect.Color, new(255, 0, 0), 2f);
+        AnimationState animation3 = Animate.Value(rect.Rotation, 50, 2f);
+        AnimationState animation4 = Animate.Value(circle.Radius, 200, 3f);
+        animation1.Updated += (_, arg) => rect.Position = arg.CurrentValues.ToVector2f();
+        animation2.Updated += (_, arg) => rect.Color = arg.CurrentValues.ToColor();
+        animation3.Updated += (_, arg) => rect.Rotation = arg.CurrentValues.ToValue();
+        animation4.Updated += (_, arg) => circle.Radius = arg.CurrentValues.ToValue();
+
+        manager.Objects.Add(rect);
+        manager.Objects.Add(circle);
+
+        while (manager.IsOpen)
         {
-            window.DispatchEvents();
-            window.Clear();
+            circle.SFShape.Origin = new(circle.Radius, circle.Radius);
 
-            polygon.Draw(window);
-        
-            window.Display();
+            animation1.Update();
+            animation2.Update();
+            animation3.Update();
+            animation4.Update();
+
+            /* Console.WriteLine($"color: {animation2.CurrentValues[0]}, {animation2.CurrentValues[1]}, {animation2.CurrentValues[2]}");
+            Console.WriteLine($"color2: {rect.Color}"); */
+
+            manager.Update();
+            manager.Draw();
         }
     }
 }

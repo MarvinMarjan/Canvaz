@@ -23,13 +23,20 @@ public interface IDrawable
 }
 
 
+public interface IUpdateable
+{
+    void Update();
+}
+
+
 /// <summary>
 /// The base class for all Canvaz's objects.
 /// </summary>
-public abstract class Object : IDrawable
+public abstract class Object : IDrawable, IUpdateable
 {
     public bool Enabled { get; set; } = true;
 
 
     public abstract void Draw(RenderWindow renderWindow);
+    public abstract void Update();
 }
