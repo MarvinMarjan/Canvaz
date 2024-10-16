@@ -1,5 +1,6 @@
 using SFML.System;
 using SFML.Graphics;
+using Canvaz.Engine.Types;
 
 
 namespace Canvaz.Engine.Shapes;
@@ -16,10 +17,10 @@ public abstract class ShapeObject : Object
     public Shape SFShape { get; set; }
 
 
-    public Vector2f Position
+    public Vec2<float> Position
     {
-        get => SFShape.Position;
-        set => SFShape.Position = value;
+        get => SFShape.Position.ToVec2f();
+        set => SFShape.Position = value.ToVector2f();
     }
 
     public float Rotation
