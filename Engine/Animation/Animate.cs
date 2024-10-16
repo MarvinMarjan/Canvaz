@@ -12,6 +12,9 @@ public static class Animate
     public static AnimationState Vector2f(Vector2f from, Vector2f to, float time, EasingType easingType = EasingType.Linear)
         => new([from.X, from.Y], [to.X, to.Y], time, easingType);
 
+
+    // TODO: animating color values, which contains a limit (0 to 255), is having a problem with easings like (back, elastic, bounce...)
+
     public static AnimationState Color(Color from, Color to, float time, EasingType easingType = EasingType.Linear)
         => new([from.R, from.G, from.B, from.A], [to.R, to.G, to.B, to.A], time, easingType);
 }

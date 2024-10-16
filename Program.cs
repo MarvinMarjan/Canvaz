@@ -14,11 +14,13 @@ public class CanvazApp
             AntialiasingLevel = 3
         });
 
-        Rectangle rect = new(new(100, 500), new(100, 100));
-        rect.Color = new(0, 0, 255);
+        Rectangle rect = new(new(100, 500), new(100, 100))
+        {
+            Color = new(0, 0, 255)
+        };
 
-        AnimationState animation1 = Animate.Vector2f(rect.Position, new(1800, 500), 2.5f, EasingType.EaseInOutCubic);
-        AnimationState animation2 = Animate.Color(rect.Color, new(255, 0, 0), 2.5f, EasingType.EaseInOutCubic);
+        AnimationState animation1 = Animate.Vector2f(rect.Position, new(1500, 500), 2f, EasingType.EaseOutCubic);
+        AnimationState animation2 = Animate.Color(rect.Color, new(255, 0, 0), 2, EasingType.EaseOutCubic);
         animation1.Updated += (_, arg) => rect.Position = arg.CurrentValues.ToVector2f();
         animation2.Updated += (_, arg) => rect.Color = arg.CurrentValues.ToColor();
 
