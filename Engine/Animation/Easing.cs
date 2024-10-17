@@ -1,8 +1,12 @@
 using System;
 
+
 namespace Canvaz.Engine.Animation;
 
 
+/// <summary>
+/// Definition of easing functions. 
+/// </summary>
 public enum EasingType
 {
     Linear,

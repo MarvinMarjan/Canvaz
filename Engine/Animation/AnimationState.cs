@@ -16,7 +16,7 @@ public class AnimationUpdatedEventArgs(float[] currentValues) : EventArgs
 /// it's because it's an approach for animating structures that have more than one
 /// data property. For example, animating a single float number isn't a problem... but
 /// what about a Color or a Vector2f? these have more than one value inside of them.
-/// By using an array of floats, animating structures like that becomes easier and
+/// By using an array of floats, animating structures like these becomes easier and
 /// more efficient that other ways. Each array index represents a property member of the
 /// structure: <br/><br/>
 /// 
@@ -43,6 +43,10 @@ public class AnimationState(float[] startValues, float[] endValues, float time, 
     /// How much the animation has progressed from 0 to 1.
     /// </summary>
     public float Progress { get; private set; }
+
+    /// <summary>
+    /// Same as this.Progress, but with eased by this.EasingType.
+    /// </summary>
     public float EasedProgress { get; private set; }
 
     public bool HasFinished => ElapsedTime >= Time;

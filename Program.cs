@@ -1,7 +1,6 @@
 using Canvaz.Engine;
 using Canvaz.Engine.Animation;
 using Canvaz.Engine.Shapes;
-using Canvaz.Engine.Types;
 
 
 namespace Canvaz;
@@ -20,9 +19,9 @@ public class CanvazApp
             Color = new(0, 0, 255)
         };
 
-        AnimationState animation1 = rect.Position.AnimateThis(new(1500, 500), 2f, EasingType.EaseOutCubic);
-        AnimationState animation2 = Animate.Color(rect.Color, new(255, 0, 0), 2, EasingType.EaseOutCubic);
-        animation1.Updated += (_, arg) => rect.Position = arg.CurrentValues.ToVector2f().ToVec2f();
+        AnimationState animation1 = rect.Position.AnimateThis(new(1500, 500), 2f, EasingType.EaseOutBack);
+        AnimationState animation2 = Animate.Color(rect.Color, new(255, 0, 0), 2, EasingType.EaseOutBack);
+        animation1.Updated += (_, arg) => rect.Position = arg.CurrentValues.ToVec2f();
         animation2.Updated += (_, arg) => rect.Color = arg.CurrentValues.ToColor();
 
         manager.Objects.Add(rect);
@@ -31,9 +30,6 @@ public class CanvazApp
         {
             animation1.Update();
             animation2.Update();
-
-            /* Console.WriteLine($"color: {animation2.CurrentValues[0]}, {animation2.CurrentValues[1]}, {animation2.CurrentValues[2]}");
-            Console.WriteLine($"color2: {rect.Color}"); */
 
             manager.Update();
             manager.Draw();

@@ -1,5 +1,6 @@
 using SFML.System;
 using SFML.Graphics;
+
 using Canvaz.Engine.Types;
 
 
@@ -17,10 +18,10 @@ public abstract class ShapeObject : Object
     public Shape SFShape { get; set; }
 
 
-    public Vec2<float> Position
+    public Vec2f Position
     {
-        get => SFShape.Position.ToVec2f();
-        set => SFShape.Position = value.ToVector2f();
+        get => SFShape.Position;
+        set => SFShape.Position = value;
     }
 
     public float Rotation
@@ -37,13 +38,13 @@ public abstract class ShapeObject : Object
     }
 
 
-    public Color Color
+    public ColorRGBA Color
     {
         get => SFShape.FillColor;
         set => SFShape.FillColor = value;
     }
 
-    public Color BorderColor
+    public ColorRGBA BorderColor
     {
         get => SFShape.OutlineColor;
         set => SFShape.OutlineColor = value;
