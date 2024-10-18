@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using SFML.Graphics;
 
 
@@ -34,9 +36,24 @@ public interface IUpdateable
 /// </summary>
 public abstract class Object : IDrawable, IUpdateable
 {
+    protected List<IUpdateable> PropertyUpdateQueue  { get; set; }
+
     public bool Enabled { get; set; } = true;
+
+
+    public Object()
+    {
+        PropertyUpdateQueue = [];
+    }
 
 
     public abstract void Draw(RenderWindow renderWindow);
     public abstract void Update();
+
+
+    public void AddPropertyToUpdateQueue(IUpdateable property)
+        => PropertyUpdateQueue.Add(property);
+
+    public void RemovePropertyFromAnimationQueue(IUpdateable property)
+        => PropertyUpdateQueue.Remove(property);
 }

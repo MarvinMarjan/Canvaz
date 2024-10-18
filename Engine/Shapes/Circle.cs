@@ -1,5 +1,7 @@
 using SFML.Graphics;
-using SFML.System;
+
+using Canvaz.Engine.Types;
+using Canvaz.Engine.Shapes.Properties;
 
 
 namespace Canvaz.Engine.Shapes;
@@ -8,17 +10,27 @@ namespace Canvaz.Engine.Shapes;
 /// <summary>
 /// Represents a circle shape.
 /// </summary>
-/// <param name="position"> Its initial position. </param>
-/// <param name="radius"> Its initial radius. </param>
-public class Circle(Vector2f position, float radius)
-    : ShapeObject(new CircleShape(radius), position)
+public class Circle : ShapeObject
 {
     new public CircleShape SFShape => (base.SFShape as CircleShape)!;
 
 
-    public float Radius
+    public Property<Float> Radius { get; private set; }
+
+
+    /// <param name="position"> Its initial position. </param>
+    /// <param name="radius"> Its initial radius. </param>
+    public Circle(Vec2f position, float radius)
+        : base(new CircleShape(radius), position)
     {
-        get => SFShape.Radius;
-        set => SFShape.Radius = value;
+        Radius = new(this, radius);
+    }
+
+
+    protected override void UpdateSFMLShapeProperties()
+    {
+        base.UpdateSFMLShapeProperties();
+
+        SFShape.Radius = Radius.Value;
     }
 }

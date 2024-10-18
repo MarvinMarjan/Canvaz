@@ -1,7 +1,8 @@
-using SFML.System;
 using SFML.Graphics;
 
 using Canvaz.Engine.Types;
+using Canvaz.Engine.Shapes.Properties;
+using System;
 
 
 namespace Canvaz.Engine.Shapes;
@@ -17,44 +18,26 @@ public abstract class ShapeObject : Object
     /// </summary>
     public Shape SFShape { get; set; }
 
+    public Property<Vec2f> Position { get; private set; }
+    public Property<Float> Rotation { get; private set; }
 
-    public Vec2f Position
-    {
-        get => SFShape.Position;
-        set => SFShape.Position = value;
-    }
+    public Property<Float> BorderSize { get; private set; }
 
-    public float Rotation
-    {
-        get => SFShape.Rotation;
-        set => SFShape.Rotation = value;
-    }
+    public Property<ColorRGBA> Color { get; private set; }
+    public Property<ColorRGBA> BorderColor { get; private set; }
 
 
-    public float BorderSize 
-    {
-        get => SFShape.OutlineThickness;
-        set => SFShape.OutlineThickness = value;
-    }
-
-
-    public ColorRGBA Color
-    {
-        get => SFShape.FillColor;
-        set => SFShape.FillColor = value;
-    }
-
-    public ColorRGBA BorderColor
-    {
-        get => SFShape.OutlineColor;
-        set => SFShape.OutlineColor = value;
-    }
-
-
-    public ShapeObject(Shape SFShape, Vector2f position)
+    public ShapeObject(Shape SFShape, Vec2f position)
     {
         this.SFShape = SFShape;
-        this.SFShape.Position = position;
+
+        Position = new(this, position);
+        Rotation = new(this, 0f);
+
+        BorderSize = new(this, 0f);
+
+        Color = new(this, new(255, 255, 255));
+        BorderColor = new(this, new(255, 255, 255));
     }
 
 
@@ -69,6 +52,21 @@ public abstract class ShapeObject : Object
 
     public override void Update()
     {
-        
+        UpdateSFMLShapeProperties();
+
+        foreach (IUpdateable updateable in PropertyUpdateQueue)
+            updateable.Update();
+    }
+
+
+    protected virtual void UpdateSFMLShapeProperties()
+    {
+        SFShape.Position = Position.Value;
+        SFShape.Rotation = Rotation.Value;
+
+        SFShape.OutlineThickness = BorderSize.Value;
+
+        SFShape.FillColor = Color.Value;
+        SFShape.OutlineColor = BorderColor.Value;
     }
 }

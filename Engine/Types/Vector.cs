@@ -6,7 +6,7 @@ using Canvaz.Engine.Animation;
 namespace Canvaz.Engine.Types;
 
 
-public class Vec2f(float x, float y) : IAnimateable<Vec2f>
+public struct Vec2f(float x, float y) : IAnimateable<Vec2f>
 {
     public float X { get; set; } = x;
     public float Y { get; set; } = y;
@@ -18,10 +18,17 @@ public class Vec2f(float x, float y) : IAnimateable<Vec2f>
 
     public AnimationState AnimateThis(Vec2f to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2f(this, to, time, easingType);
+
+    public readonly Vec2f ConvertAnimationValues(float[] values)
+        => values.ToVec2f();
+
+
+    public override readonly string ToString()
+        => $"Vec2f({X}, {Y})";
 }
 
 
-public class Vec2i(int x, int y) : IAnimateable<Vec2i>
+public struct Vec2i(int x, int y) : IAnimateable<Vec2i>
 {
     public int X { get; set; } = x;
     public int Y { get; set; } = y;
@@ -33,10 +40,16 @@ public class Vec2i(int x, int y) : IAnimateable<Vec2i>
 
     public AnimationState AnimateThis(Vec2i to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2i(this, to, time, easingType);
+
+    public readonly Vec2i ConvertAnimationValues(float[] values)
+        => values.ToVec2i();
+
+    public override readonly string ToString()
+        => $"Vec2i({X}, {Y})";
 }
 
 
-public class Vec2u(uint x, uint y) : IAnimateable<Vec2u>
+public struct Vec2u(uint x, uint y) : IAnimateable<Vec2u>
 {
     public uint X { get; set; } = x;
     public uint Y { get; set; } = y;
@@ -48,4 +61,10 @@ public class Vec2u(uint x, uint y) : IAnimateable<Vec2u>
 
     public AnimationState AnimateThis(Vec2u to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2u(this, to, time, easingType);
+
+    public readonly Vec2u ConvertAnimationValues(float[] values)
+        => values.ToVec2u();
+
+    public override readonly string ToString()
+        => $"Vec2u({X}, {Y})";
 }

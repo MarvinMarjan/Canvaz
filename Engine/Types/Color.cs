@@ -6,7 +6,7 @@ using Canvaz.Engine.Animation;
 namespace Canvaz.Engine.Types;
 
 
-public class ColorRGBA : IAnimateable<ColorRGBA>
+public struct ColorRGBA : IAnimateable<ColorRGBA>
 {
     private byte _r;
 
@@ -59,4 +59,10 @@ public class ColorRGBA : IAnimateable<ColorRGBA>
 
     public AnimationState AnimateThis(ColorRGBA to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Color(this, to, time, easingType);
+
+    public readonly ColorRGBA ConvertAnimationValues(float[] values)
+        => values.ToColorRGBA();
+
+    public override string ToString()
+        => $"rgba({R}, {G}, {B}, {A})";
 }

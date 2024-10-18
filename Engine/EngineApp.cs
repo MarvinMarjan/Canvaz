@@ -34,6 +34,9 @@ public class EngineApp : RenderWindow
     {
         DeltaTime = _deltaTimeClock.Restart();
 
+        foreach (Object @object in Objects)
+            @object.Update();
+
         DispatchEvents();
     }
 
