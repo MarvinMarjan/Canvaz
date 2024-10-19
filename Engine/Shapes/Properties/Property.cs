@@ -1,13 +1,23 @@
-using System;
 using Canvaz.Engine.Animation;
 
 
 namespace Canvaz.Engine.Shapes.Properties;
 
 
-public class Property<T> : IUpdateable where T : IAnimateable<T>
+/// <summary>
+/// Represents a Canvaz.Object property that can be animated.
+/// </summary>
+public class Property<T> : IUpdateable
+    where T : IAnimateable<T>
 {
+    /// <summary>
+    /// The owner of this property.
+    /// </summary>
     public Object Owner { get; set; }
+
+    /// <summary>
+    /// The current value of the property.
+    /// </summary>
     public T Value { get; set; }
 
 
@@ -37,6 +47,7 @@ public class Property<T> : IUpdateable where T : IAnimateable<T>
         _animationState.Updated += (obj, arg)
             => Value = Value.ConvertAnimationValues(arg.CurrentValues);
     }
+
 
     public void Update()
     {

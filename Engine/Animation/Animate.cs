@@ -1,8 +1,9 @@
+using System;
+
 using SFML.System;
 using SFML.Graphics;
 
 using Canvaz.Engine.Types;
-using System;
 
 
 namespace Canvaz.Engine.Animation;

@@ -16,7 +16,7 @@ public struct Vec2f(float x, float y) : IAnimateable<Vec2f>
     public static implicit operator Vec2f(Vector2f vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationState AnimateThis(Vec2f to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(Vec2f to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2f(this, to, time, easingType);
 
     public readonly Vec2f ConvertAnimationValues(float[] values)
@@ -38,7 +38,7 @@ public struct Vec2i(int x, int y) : IAnimateable<Vec2i>
     public static implicit operator Vec2i(Vector2i vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationState AnimateThis(Vec2i to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(Vec2i to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2i(this, to, time, easingType);
 
     public readonly Vec2i ConvertAnimationValues(float[] values)
@@ -59,7 +59,7 @@ public struct Vec2u(uint x, uint y) : IAnimateable<Vec2u>
     public static implicit operator Vec2u(Vector2u vec2) => new(vec2.X, vec2.Y);
 
 
-    public AnimationState AnimateThis(Vec2u to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(Vec2u to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Vec2u(this, to, time, easingType);
 
     public readonly Vec2u ConvertAnimationValues(float[] values)

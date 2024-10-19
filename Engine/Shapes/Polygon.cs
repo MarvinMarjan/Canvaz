@@ -13,12 +13,29 @@ public class Polygon : ShapeObject
 {
     new public ConvexShape SFShape => (base.SFShape as ConvexShape)!;
 
-    // TODO: add points property here
+    public Vec2f[] Points { get; set; }
+
 
     public Polygon(Vec2f[] points)
         : base(new ConvexShape((uint)points.Length), new())
     {
-        for (int i = 0; i < points.Length; i++)
-            SFShape.SetPoint((uint)i, points[i]);
+        Points = points;
+
+        SetPoints();
+    }
+
+
+    private void SetPoints()
+    {
+        for (int i = 0; i < Points.Length; i++)
+            SFShape.SetPoint((uint)i, Points[i]);
+    }
+
+
+    protected override void UpdateSFMLShapeProperties()
+    {
+        base.UpdateSFMLShapeProperties();
+
+        SetPoints();
     }
 }

@@ -12,7 +12,7 @@ public struct ColorRGBA : IAnimateable<ColorRGBA>
 
     public byte R
     {
-        get => _r;
+        readonly get => _r;
         set => _r = Math.Clamp(value, (byte)0, (byte)255);
     }
 
@@ -21,7 +21,7 @@ public struct ColorRGBA : IAnimateable<ColorRGBA>
 
     public byte G
     {
-        get => _g;
+        readonly get => _g;
         set => _g = Math.Clamp(value, (byte)0, (byte)255);
     }
 
@@ -30,7 +30,7 @@ public struct ColorRGBA : IAnimateable<ColorRGBA>
 
     public byte B
     {
-        get => _b;
+        readonly get => _b;
         set => _b = Math.Clamp(value, (byte)0, (byte)255);
     }
 
@@ -39,7 +39,7 @@ public struct ColorRGBA : IAnimateable<ColorRGBA>
 
     public byte A
     {
-        get => _a;
+        readonly get => _a;
         set => _a = Math.Clamp(value, (byte)0, (byte)255);
     }
 
@@ -57,12 +57,12 @@ public struct ColorRGBA : IAnimateable<ColorRGBA>
     public static implicit operator ColorRGBA(SFML.Graphics.Color color) => new(color.R, color.G, color.B, color.A);
 
 
-    public AnimationState AnimateThis(ColorRGBA to, float time, EasingType easingType = EasingType.Linear)
+    public readonly AnimationState AnimateThis(ColorRGBA to, float time, EasingType easingType = EasingType.Linear)
         => Animate.Color(this, to, time, easingType);
 
     public readonly ColorRGBA ConvertAnimationValues(float[] values)
         => values.ToColorRGBA();
 
-    public override string ToString()
+    public override readonly string ToString()
         => $"rgba({R}, {G}, {B}, {A})";
 }

@@ -15,10 +15,10 @@ public class CanvazApp
         });
 
         Rectangle rect = new(new(100, 500), new(100, 100));
-        rect.Color.Set(new(255, 0, 0));
+        rect.Color.Set(new(255, 255, 0));
 
-        rect.Position.Animate(new(1500, 500), 2f, EasingType.EaseOutBack);
-        rect.Color.Animate(new(255, 0, 0), 2, EasingType.EaseOutBack);
+        rect.Position.Animate(new(1500, 500), 2f, EasingType.EaseInOutQuint);
+        rect.Color.Animate(new(255, 0, 0), 2, EasingType.EaseInOutQuint);
 
         manager.Objects.Add(rect);
 

@@ -2,7 +2,6 @@ using SFML.Graphics;
 
 using Canvaz.Engine.Types;
 using Canvaz.Engine.Shapes.Properties;
-using System;
 
 
 namespace Canvaz.Engine.Shapes;

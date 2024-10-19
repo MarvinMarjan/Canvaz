@@ -16,7 +16,7 @@ public class EngineApp : RenderWindow
     public static float DTSeconds => DeltaTime.AsSeconds();
     public static int DTMilliseconds => DeltaTime.AsMilliseconds();
 
-    private Clock _deltaTimeClock;
+    private readonly Clock _deltaTimeClock;
 
 
     public EngineApp(string title, ContextSettings contextSettings)
