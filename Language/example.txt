@@ -1,0 +1,7 @@
+var myrect = Rectangle {
+    NameId: "MyRect",
+    Position: vec2f(100.123, 200f),
+    Size: vec2f(100f, 100f) ^
+    Rotation: 0f,
+    Color: rgb(255, 0, 255),
+}

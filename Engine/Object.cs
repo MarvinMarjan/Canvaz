@@ -36,7 +36,7 @@ public interface IUpdateable
 /// </summary>
 public abstract class Object : IDrawable, IUpdateable
 {
-    protected List<IUpdateable> PropertyUpdateQueue  { get; set; }
+    protected List<IUpdateable> PropertyUpdateQueue { get; set; }
 
     public bool Enabled { get; set; } = true;
 
