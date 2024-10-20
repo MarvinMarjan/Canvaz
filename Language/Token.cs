@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+
+using Type = Canvaz.Language.Typing.Type;
+
+
 namespace Canvaz.Language;
 
 
@@ -8,18 +12,23 @@ public enum TokenType
 {
     Invalid,
 
+    Hash,
+
     Plus, Minus, Asterisk, Slash,
-    Equal,
+    Equal, EqualEqual, BangEqual,
+
+    Greater, GreaterEqual, Less, LessEqual,
 
     ParenLeft, ParenRight, BracketLeft, BracketRight, BraceLeft, BraceRight,
 
     Colon, Comma, Quote,
 
-    String, True, False,
+    String, True, False, Null,
     FloatNumber, IntegerNumber, UIntegerNumber,
     Identifier,
 
-    Var
+    Not, And, Or,
+    Print, Var
 }
 
 
@@ -45,12 +54,17 @@ public readonly struct TokenRange
 }
 
 
-public readonly struct Token(string lexeme, int start, int end, int line, TokenType tokenType, object? value = null)
+public readonly struct Token(string lexeme, int start, int end, int line, TokenType tokenType, Type? value = null)
 {
     public static Dictionary<string, TokenType> Keywords { get; } = new([
-        new("var", TokenType.Var),
+        new("not", TokenType.Not),
+        new("and", TokenType.And),
+        new("or", TokenType.Or),
         new("true", TokenType.True),
-        new("false", TokenType.False)
+        new("false", TokenType.False),
+        new("null", TokenType.Null),
+        new("print", TokenType.Print),
+        new("var", TokenType.Var)
     ]);
 
 
@@ -59,7 +73,7 @@ public readonly struct Token(string lexeme, int start, int end, int line, TokenT
     public int End { get; init; } = end;
     public int Line { get; init; } = line;
     public TokenType Type { get; init; } = tokenType;
-    public object? Value { get; init; } = value;
+    public Type Value { get; init; } = value ?? new(null);
 
 
     public override string ToString()

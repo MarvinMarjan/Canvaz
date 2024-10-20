@@ -4,7 +4,7 @@ using Specter.ANSI;
 using Specter.Color;
 
 
-namespace Canvaz.Language.Exception;
+namespace Canvaz.Language.Exceptions;
 
 
 public static class ExceptionFormatter
@@ -26,5 +26,15 @@ public static class ExceptionFormatter
         arrow.Append(EscapeCodes.Reset);
 
         return arrow.ToString();
+    }
+
+
+    public static string HighlightTokenWithColor(TokenRange range, ColorObject color)
+    {
+        string line = CanvazLanguage.CurrentSourceLines[range.Start.Line - 1];
+        line = line.Insert(range.End.End, ColorValue.Reset.AsSequence());
+        line = line.Insert(range.Start.Start, color.AsSequence());
+
+        return line;
     }
 }

@@ -1,7 +1,12 @@
-var myrect = Rectangle {
+#<var myrect = Rectangle {
     NameId: "MyRect",
     Position: vec2f(100.123, 200f),
-    Size: vec2f(100f, 100f) ^
+    Size: vec2f(100f, 100f)
     Rotation: 0f,
     Color: rgb(255, 0, 255),
-}
+}>#
+
+var num1 = 3.14159 * 3.14159
+var num2 = num1 * num1 * num1
+
+print not num1 < num2
