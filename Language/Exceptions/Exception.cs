@@ -31,8 +31,10 @@ public class CanvazLangException : Exception
 
     public override string ToString()
     {
-        if (TokenRange is not TokenRange validRange)
+        if (TokenRange is null && CanvazLanguage.CurrentRuntimeTokenReference is null)
             return Message;
+
+        TokenRange validRange = TokenRange ?? new(CanvazLanguage.CurrentRuntimeTokenReference!.Value);
 
         StringBuilder builder = new();
 

@@ -136,14 +136,15 @@ public class Scanner
         while (char.IsLetterOrDigit(Peek()))
             Advance();
 
-        if (Token.Keywords.TryGetValue(CurrentSubstring(), out TokenType keyword))
-            AddToken(keyword, new(keyword switch {
-                TokenType.True => true,
-                TokenType.False => false,
-                TokenType.Null => null,
+        Type? value = null;
 
-                _ => null
-            }, new(TokenFromCurrent())));
+        if (Token.IsKeyword(CurrentSubstring(), out TokenType? keyword, out bool isKeywordValue))
+        {
+            if (isKeywordValue)
+                value = Type.FromTokenType(keyword!.Value, new(TokenFromCurrent()));
+
+            AddToken(keyword!.Value, value);
+        }
         else
             AddToken(TokenType.Identifier);
     }
@@ -166,6 +167,7 @@ public class Scanner
         
         Advance();
 
+        // everything between "
         string value = _source[(_start + 1) .. (_end - 1)];
 
         AddToken(TokenType.String, new(value, new(stringStart, TokenFromCurrent())));

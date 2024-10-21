@@ -41,9 +41,10 @@ public class IdentifierExpression(Token identifier) : Expression
 }
 
 
-public class AssignmentExpression(Token identifier, Expression value) : Expression
+public class AssignmentExpression(Token identifier, Token equalSign, Expression value) : Expression
 {
     public Token Identifier { get; set; } = identifier;
+    public Token EqualSign { get; set; } = equalSign;
     public Expression Value { get; set; } = value;
 
 

@@ -8,6 +8,9 @@ using Type = Canvaz.Language.Typing.Type;
 namespace Canvaz.Language;
 
 
+/// <summary>
+/// All types of tokens.
+/// </summary>
 public enum TokenType
 {
     Invalid,
@@ -66,6 +69,20 @@ public readonly struct Token(string lexeme, int start, int end, int line, TokenT
         new("print", TokenType.Print),
         new("var", TokenType.Var)
     ]);
+
+
+    public static bool IsKeyword(string identifier, out TokenType? keyword, out bool isKeywordValue)
+    {
+        bool isKeyword;
+        keyword = null;
+
+        if (isKeyword = Keywords.TryGetValue(identifier, out TokenType value))
+            keyword = value;
+        
+        isKeywordValue = identifier is "true" or "false" or "null";
+    
+        return isKeyword;
+    }
 
 
     public string Lexeme { get; init; } = lexeme;

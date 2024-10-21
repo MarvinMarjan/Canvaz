@@ -49,6 +49,16 @@ public partial class Type
     }
 
 
+    public static Type FromTokenType(TokenType tokenType, TokenRange? referenceToken = null)
+        => new(tokenType switch {
+            TokenType.True => true,
+            TokenType.False => false,
+            TokenType.Null => null,
+
+            _ => null
+        }, referenceToken);
+
+
     public override string ToString()
     {
         string text = Value?.ToString() ?? "null";

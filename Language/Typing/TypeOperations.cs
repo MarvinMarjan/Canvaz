@@ -200,8 +200,6 @@ public partial class Type
         throw NewError($"Can't determine truthiness of {TypeName}.");
     }
 
-    // TODO: find out a better way to track token position.
-
     public bool Equals(Type other)
         => (this == other).AsBoolean();
 

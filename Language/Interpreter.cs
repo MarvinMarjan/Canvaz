@@ -59,6 +59,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public Type ProcessIdentifierExpression(IdentifierExpression expression)
     {
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.Identifier;
+
         string identifierName = expression.Identifier.Lexeme;
 
         if (!Variables.TryGetValue(identifierName, out Type? value))
@@ -71,6 +73,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public Type ProcessAssignmentExpression(AssignmentExpression expression)
     {
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.EqualSign;
+
         if (!Variables.ContainsKey(expression.Identifier.Lexeme))
             throw NewError($"Not defined identifier '{expression.Identifier.Lexeme}'.", expression.Identifier);
 
@@ -81,6 +85,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         Type left = Interpret(expression.Left);
         Type right = Interpret(expression.Right);
+
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.Operator;
 
         return expression.Operator.Type switch
         {
@@ -107,6 +113,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     public Type ProcessUnaryExpression(UnaryExpression expression)
     {
         Type right = Interpret(expression.Right);
+
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.Operator;
 
         return expression.Operator.Type switch
         {

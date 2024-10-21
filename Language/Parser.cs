@@ -103,7 +103,7 @@ public class Parser
             if (expression is IdentifierExpression identifierExpression)
             {
                 Token name = identifierExpression.Identifier;
-                return new AssignmentExpression(name, value);
+                return new AssignmentExpression(name, equal, value);
             }
 
             throw NewError("Can't assign a non-variable value.", equal);
@@ -205,7 +205,7 @@ public class Parser
     {
         if (Match(TokenType.String, TokenType.FloatNumber, TokenType.IntegerNumber, TokenType.UIntegerNumber,
                             TokenType.True, TokenType.False, TokenType.Null))
-            return new LiteralExpression(Previous().Value!);
+            return new LiteralExpression(Previous().Value);
 
         if (Match(TokenType.Identifier))
             return new IdentifierExpression(Previous());

@@ -16,6 +16,11 @@ public static class CanvazLanguage
     public static string CurrentSource { get; private set; } = "";
     public static string[] CurrentSourceLines { get; private set; } = [];
 
+    /// <summary>
+    /// The token reference of the current operation the interpreter is executing.
+    /// </summary>
+    public static Token? CurrentRuntimeTokenReference { get; set; }
+
     public static bool HasError { get; private set; }
 
 
