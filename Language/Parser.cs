@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Canvaz.Language.Exceptions;
@@ -53,9 +54,29 @@ public class Parser
     private Statement Statement() => Peek().Type switch
     {
         TokenType.Print => PrintStatement(),
+        TokenType.If => IfElseStatement(),
+        TokenType.While => WhileStatement(),
+        TokenType.BraceLeft => new BlockStatement(Block()),
 
         _ => ExpressionStatement()
     };
+
+
+    private ExpressionStatement ExpressionStatement()
+        => new(Expression());
+
+    private List<Statement> Block()
+    {
+        Advance();
+
+        List<Statement> statements = [];
+
+        while (!Check(TokenType.BraceRight) && !AtEnd())
+            statements.Add(Declaration());
+
+        Expect(TokenType.BraceRight, "Expect '}' to finish a block.");
+        return statements;
+    }
 
 
     private PrintStatement PrintStatement()
@@ -77,8 +98,30 @@ public class Parser
     }
 
 
-    private ExpressionStatement ExpressionStatement()
-        => new(Expression());
+    private IfElseStatement IfElseStatement()
+    {
+        Advance();
+
+        Expression condition = Expression();
+        Statement thenStatement = Statement();
+        Statement? elseStatement = null;
+
+        if (Match(TokenType.Else))
+            elseStatement = Statement();
+
+        return new(condition, thenStatement, elseStatement);
+    }
+
+
+    private WhileStatement WhileStatement()
+    {
+        Advance();
+
+        Expression condition = Expression();
+        Statement statement = Statement();
+
+        return new(condition, statement);
+    }
 
 
 

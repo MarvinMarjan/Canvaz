@@ -31,7 +31,7 @@ public enum TokenType
     Identifier,
 
     Not, And, Or,
-    Print, Var
+    Print, Var, If, Else, While
 }
 
 
@@ -67,7 +67,10 @@ public readonly struct Token(string lexeme, int start, int end, int line, TokenT
         new("false", TokenType.False),
         new("null", TokenType.Null),
         new("print", TokenType.Print),
-        new("var", TokenType.Var)
+        new("var", TokenType.Var),
+        new("if", TokenType.If),
+        new("else", TokenType.Else),
+        new("while", TokenType.While),
     ]);
 
 

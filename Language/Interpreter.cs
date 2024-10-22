@@ -36,6 +36,12 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         return null;
     }
 
+    public object? ProcessBlockStatement(BlockStatement statement)
+    {
+        Interpret(statement.Statements);
+        return null;
+    }
+
     public object? ProcessPrintStatement(PrintStatement statement)
     {
         Console.WriteLine(Interpret(statement.Value)?.ToString());
@@ -48,6 +54,25 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
             throw NewError("Variable already declared.", statement.Name);
 
         Variables.Add(statement.Name.Lexeme, Interpret(statement.Value));
+        return null;
+    }
+
+    public object? ProcessIfElseStatement(IfElseStatement statement)
+    {
+        if (Interpret(statement.Condition).IsTruthy())
+            Interpret(statement.ThenStatement);
+
+        else if (statement.ElseStatement is not null)
+            Interpret(statement.ElseStatement);
+
+        return null;
+    }
+
+    public object? ProcessWhileStatement(WhileStatement statement)
+    {
+        while (Interpret(statement.Condition).IsTruthy())
+            Interpret(statement.BlockStatement);
+
         return null;
     }
 

@@ -5,9 +5,3 @@
     Rotation: 0f,
     Color: rgb(255, 0, 255),
 }>#
-
-var num1 = 3.14159 * 3.14159
-var num2 = num1 * num1 * num1
-
-print not (num1 < num2)
-print (2 == 2) + 8
