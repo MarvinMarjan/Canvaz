@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using Canvaz.Language.Exceptions;
@@ -43,32 +42,35 @@ public class Parser
 
 
 
-    private Statement Declaration() => Peek().Type switch
+    private Statement Declaration()
     {
-        TokenType.Var => VarDeclarationStatement(),
+        TokenType tokenType = Advance().Type;
 
-        _ => Statement()
-    };
+        if (tokenType == TokenType.Var) return VarDeclarationStatement();
+        if (tokenType == TokenType.Structure) return StructureDeclarationStatement();
 
+        Retreat();
+        return Statement();
+    }
 
-    private Statement Statement() => Peek().Type switch
+    private Statement Statement()
     {
-        TokenType.Print => PrintStatement(),
-        TokenType.If => IfElseStatement(),
-        TokenType.While => WhileStatement(),
-        TokenType.BraceLeft => new BlockStatement(Block()),
+        TokenType tokenType = Advance().Type;
+    
+        if (tokenType == TokenType.Print) return PrintStatement();
+        if (tokenType == TokenType.If) return IfElseStatement();
+        if (tokenType == TokenType.While) return WhileStatement();
+        if (tokenType == TokenType.BraceLeft) return new BlockStatement(Block());
 
-        _ => ExpressionStatement()
-    };
-
+        Retreat();
+        return ExpressionStatement();
+    }
 
     private ExpressionStatement ExpressionStatement()
         => new(Expression());
 
     private List<Statement> Block()
     {
-        Advance();
-
         List<Statement> statements = [];
 
         while (!Check(TokenType.BraceRight) && !AtEnd())
@@ -80,28 +82,27 @@ public class Parser
 
 
     private PrintStatement PrintStatement()
-    {
-        Advance();
-        return new(Expression());
-    }
+        => new(Expression());
 
 
     private VarDeclarationStatement VarDeclarationStatement()
     {
-        Advance();
-
         Token name = Expect(TokenType.Identifier, "Variable name expected.");
-        Expect(TokenType.Equal, "Equal operator expected.");
-        Expression value = Expression();
+        Token? typeName = null;
+        Expression? value = null;
 
-        return new(name, value);
+        if (Match(TokenType.Colon))
+            typeName = Expect(TokenType.Identifier, "Type name expected.");
+
+        if (Match(TokenType.Equal))
+            value = Expression();
+
+        return new(name, typeName, value);
     }
 
 
     private IfElseStatement IfElseStatement()
     {
-        Advance();
-
         Expression condition = Expression();
         Statement thenStatement = Statement();
         Statement? elseStatement = null;
@@ -115,12 +116,28 @@ public class Parser
 
     private WhileStatement WhileStatement()
     {
-        Advance();
-
         Expression condition = Expression();
         Statement statement = Statement();
 
         return new(condition, statement);
+    }
+
+
+    private StructureDeclarationStatement StructureDeclarationStatement()
+    {
+        Token name = Expect(TokenType.Identifier, "Structure name expected.");
+        List<VarDeclarationStatement> varDeclarations = [];
+
+        Expect(TokenType.BraceLeft, "Expect '{' after structure name.");
+
+        while (!Check(TokenType.BraceRight) && !AtEnd())
+        {
+            Advance();
+            varDeclarations.Add(VarDeclarationStatement());
+        }
+
+        Expect(TokenType.BraceRight, "Expect '}' after structure body.");
+        return new(name, varDeclarations);
     }
 
 
@@ -233,7 +250,7 @@ public class Parser
 
     private Expression Unary()
     {
-        if (Match(TokenType.Minus, TokenType.Not))
+        if (Match(TokenType.Minus, TokenType.Not, TokenType.Typeof))
         {
             Token @operator = Previous();
             Expression right = Unary();
@@ -328,6 +345,9 @@ public class Parser
 
     private bool AtEnd()
         => _current >= _tokens.Count;
+
+    private bool AtBeginning()
+        => _current <= 0;
     
 
     private Token Advance()
@@ -338,8 +358,19 @@ public class Parser
         return Previous();
     }
 
+    private Token Retreat()
+    {
+        if (!AtBeginning())
+            _current--;
+        
+        return Next();
+    }
+
     private Token Peek()
         => _tokens[_current];
+
+    private Token Next()
+        => _tokens[_current + 1];
 
     private Token Previous()
         => _tokens[_current - 1];

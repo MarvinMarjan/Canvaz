@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Canvaz.Language.Exceptions;
-
-
+using Canvaz.Language.Typing;
 using Type = Canvaz.Language.Typing.Type;
 
 
@@ -141,7 +140,7 @@ public class Scanner
         if (Token.IsKeyword(CurrentSubstring(), out TokenType? keyword, out bool isKeywordValue))
         {
             if (isKeywordValue)
-                value = Type.FromTokenType(keyword!.Value, new(TokenFromCurrent()));
+                value = Type.FromTokenTypeLiteral(keyword!.Value);
 
             AddToken(keyword!.Value, value);
         }
@@ -170,7 +169,7 @@ public class Scanner
         // everything between "
         string value = _source[(_start + 1) .. (_end - 1)];
 
-        AddToken(TokenType.String, new(value, new(stringStart, TokenFromCurrent())));
+        AddToken(TokenType.String, new(value, TypeName.FromGeneric<string>()));
     }
 
 
@@ -214,7 +213,7 @@ public class Scanner
     private void AddNumberToken<T>(string text, TokenType tokenType) where T : IParsable<T>
     {
         _ = T.TryParse(text, null, out T? value);
-        AddToken(tokenType, new(value, new(TokenFromCurrent())));
+        AddToken(tokenType, new(value, TypeName.FromGeneric<T>()));
     }
 
     private void AdvanceUntilNonDigit()

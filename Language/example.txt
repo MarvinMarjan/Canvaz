@@ -1,7 +1,16 @@
-#<var myrect = Rectangle {
+#< var myrect = Rectangle {
     NameId: "MyRect",
-    Position: vec2f(100.123, 200f),
-    Size: vec2f(100f, 100f)
+    Position: Vec2f(100.123, 200f),
+    Size: Vec2f(100f, 100f)
     Rotation: 0f,
-    Color: rgb(255, 0, 255),
-}>#
+    Color: RGB(255, 0, 255),
+} >#
+
+
+structure Person
+{
+    var name: String
+    var age: Integer
+}
+
+var person: Person

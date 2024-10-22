@@ -12,7 +12,16 @@ namespace Canvaz.Language;
 
 public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<object?>
 {
+    public static Interpreter? Current { get; private set; }
+
     public Dictionary<string, Type> Variables { get; init; } = [];
+    public Dictionary<string, StructureDeclarationStatement> Structures { get; init; } = [];
+
+
+    public Interpreter()
+    {
+        Current = this;
+    }
 
 
     public void Interpret(Statement statement)
@@ -53,7 +62,15 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         if (Variables.ContainsKey(statement.Name.Lexeme))
             throw NewError("Variable already declared.", statement.Name);
 
-        Variables.Add(statement.Name.Lexeme, Interpret(statement.Value));
+        Type variable;
+        object? value = statement.Value is Expression validValue ? Interpret(validValue).Value : null;
+
+        if (statement.TypeName is Token typeName)
+            variable = new(value, new(typeName.Lexeme));
+        else
+            variable = new(value);
+
+        Variables.Add(statement.Name.Lexeme, variable);
         return null;
     }
 
@@ -72,6 +89,13 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         while (Interpret(statement.Condition).IsTruthy())
             Interpret(statement.BlockStatement);
+
+        return null;
+    }
+
+    public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
+    {
+        Structures.Add(statement.Name.Lexeme, statement);
 
         return null;
     }
@@ -100,10 +124,12 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         CanvazLanguage.CurrentRuntimeTokenReference = expression.EqualSign;
 
-        if (!Variables.ContainsKey(expression.Identifier.Lexeme))
+        if (!Variables.TryGetValue(expression.Identifier.Lexeme, out Type? value))
             throw NewError($"Not defined identifier '{expression.Identifier.Lexeme}'.", expression.Identifier);
 
-        return Variables[expression.Identifier.Lexeme] = Interpret(expression.Value);
+        value.Value = Interpret(expression.Value).Value;
+
+        return value;
     }
 
     public Type ProcessBinaryExpression(BinaryExpression expression)
@@ -145,6 +171,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         {
             TokenType.Minus => -right,
             TokenType.Not => !right,
+            TokenType.Typeof => new(right.TypeName.ToString()),
             
             _ => throw NewError("Invalid unary expression.", expression.Operator),
         };

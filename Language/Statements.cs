@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+
 namespace Canvaz.Language;
 
 
@@ -11,6 +12,7 @@ public interface IStatementProcessor<T>
     public T ProcessVarDeclarationStatement(VarDeclarationStatement statement);
     public T ProcessIfElseStatement(IfElseStatement statement);
     public T ProcessWhileStatement(WhileStatement statement);
+    public T ProcessStructureDeclarationStatement(StructureDeclarationStatement statement);
 }
 
 
@@ -49,11 +51,13 @@ public class PrintStatement(Expression value) : Statement
         => processor.ProcessPrintStatement(this);
 }
 
+// TODO: set all properties to "init"
 
-public class VarDeclarationStatement(Token name, Expression value) : Statement
+public class VarDeclarationStatement(Token name, Token? typeName, Expression? value) : Statement
 {
     public Token Name { get; init; } = name;
-    public Expression Value { get; init; } = value;
+    public Token? TypeName { get; init; } = typeName;
+    public Expression? Value { get; init; } = value;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)
@@ -81,4 +85,15 @@ public class WhileStatement(Expression condition, Statement blockStatement) : St
 
     public override T Process<T>(IStatementProcessor<T> processor)
         => processor.ProcessWhileStatement(this);
+}
+
+
+public class StructureDeclarationStatement(Token name, List<VarDeclarationStatement> members) : Statement
+{
+    public Token Name { get; set; } = name;
+    public List<VarDeclarationStatement> Members { get; set; } = members;
+
+
+    public override T Process<T>(IStatementProcessor<T> processor)
+        => processor.ProcessStructureDeclarationStatement(this);
 }

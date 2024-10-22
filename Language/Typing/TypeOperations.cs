@@ -1,7 +1,5 @@
 using System;
 
-using Canvaz.Engine.Types;
-
 
 namespace Canvaz.Language.Typing;
 
@@ -16,12 +14,9 @@ public partial class Type
         BinaryOperation<float, float>(left, right, ref result, (l, r) => l + r);
         BinaryOperation<int, int>(left, right, ref result, (l, r) => l + r);
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l + r);
-        BinaryOperation<Vec2f, Vec2f>(left, right, ref result, (l, r) => l + r);
-        BinaryOperation<Vec2i, Vec2i>(left, right, ref result, (l, r) => l + r);
-        BinaryOperation<Vec2u, Vec2u>(left, right, ref result, (l, r) => l + r);
 
         if (result is null)
-            throw left.NewError($"'+' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'+' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
 
         return result;
     }
@@ -34,12 +29,9 @@ public partial class Type
         BinaryOperation<float, float>(left, right, ref result, (l, r) => l - r);
         BinaryOperation<int, int>(left, right, ref result, (l, r) => l - r);
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l - r);
-        BinaryOperation<Vec2f, Vec2f>(left, right, ref result, (l, r) => l - r);
-        BinaryOperation<Vec2i, Vec2i>(left, right, ref result, (l, r) => l - r);
-        BinaryOperation<Vec2u, Vec2u>(left, right, ref result, (l, r) => l - r);
 
         if (result is null)
-            throw left.NewError($"'-' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'-' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -53,7 +45,7 @@ public partial class Type
         UnaryOperation<int, int>(right, ref result, r => -r);
 
         if (result is null)
-            throw right.NewError($"Unary '-' is not applicable for {right.TypeName}.");
+            throw NewError($"Unary '-' is not applicable for '{right.TypeName}'.");
     
         return result;
     }
@@ -70,12 +62,9 @@ public partial class Type
         BinaryOperation<float, float>(left, right, ref result, (l, r) => l * r);
         BinaryOperation<int, int>(left, right, ref result, (l, r) => l * r);
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l * r);
-        BinaryOperation<Vec2f, Vec2f>(left, right, ref result, (l, r) => l * r);
-        BinaryOperation<Vec2i, Vec2i>(left, right, ref result, (l, r) => l * r);
-        BinaryOperation<Vec2u, Vec2u>(left, right, ref result, (l, r) => l * r);
 
         if (result is null)
-            throw left.NewError($"'*' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'*' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -88,12 +77,9 @@ public partial class Type
         BinaryOperation<float, float>(left, right, ref result, (l, r) => l / r);
         BinaryOperation<int, int>(left, right, ref result, (l, r) => l / r);
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l / r);
-        BinaryOperation<Vec2f, Vec2f>(left, right, ref result, (l, r) => l / r);
-        BinaryOperation<Vec2i, Vec2i>(left, right, ref result, (l, r) => l / r);
-        BinaryOperation<Vec2u, Vec2u>(left, right, ref result, (l, r) => l / r);
 
         if (result is null)
-            throw left.NewError($"'/' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'/' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -138,7 +124,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l > r);
 
         if (result is null)
-            throw left.NewError($"'>' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'>' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -153,7 +139,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l < r);
 
         if (result is null)
-            throw left.NewError($"'<' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'<' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -168,7 +154,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l >= r);
 
         if (result is null)
-            throw left.NewError($"'>=' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'>=' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -183,7 +169,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l <= r);
 
         if (result is null)
-            throw left.NewError($"'<=' is not applicable for {left.TypeName} and {right.TypeName}.");
+            throw NewError($"'<=' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
     
         return result;
     }
@@ -194,10 +180,10 @@ public partial class Type
         if (IsNull())
             return false;
 
-        if (TypeName == TypeName.Boolean)
+        if (TypeName.Is<bool>())
             return AsBoolean();
 
-        throw NewError($"Can't determine truthiness of {TypeName}.");
+        throw NewError($"Can't determine truthiness of '{TypeName}'.");
     }
 
     public bool Equals(Type other)
@@ -213,13 +199,13 @@ public partial class Type
 
     private static void BinaryOperation<T, TResult>(Type left, Type right, ref Type? result, Func<T, T, TResult> operation)
     {
-        if (BothOfType(left.TypeName, right.TypeName, TypeNameFromType<T>()))
+        if (BothOfType(left.TypeName, right.TypeName, TypeName.FromGeneric<T>()))
             result = new(operation(left.As<T>(), right.As<T>()));
     }
 
     private static void UnaryOperation<T, TResult>(Type right, ref Type? result, Func<T, TResult> operation)
     {
-        if (right.TypeName == TypeNameFromType<T>())
+        if (right.TypeName == TypeName.FromGeneric<T>())
             result = new(operation(right.As<T>()));
     }
 }
