@@ -3,6 +3,8 @@ using System.Text;
 using Specter.ANSI;
 using Specter.Color;
 
+using Canvaz.Language.Definitions;
+
 
 namespace Canvaz.Language.Exceptions;
 

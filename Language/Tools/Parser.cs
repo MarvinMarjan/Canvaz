@@ -359,12 +359,10 @@ public class Parser
         return Previous();
     }
 
-    private Token Retreat()
+    private void Retreat()
     {
         if (!AtBeginning())
             _current--;
-        
-        return Next();
     }
 
     private Token Peek()

@@ -72,7 +72,7 @@ public class TypeName
         if (Primitives.Contains(name))
             return true;
 
-        return Interpreter.Current?.Structures.ContainsKey(name) ?? false;
+        return Interpreter.Current?.Environment.Structures.ContainsKey(name) ?? false;
     }
 
 

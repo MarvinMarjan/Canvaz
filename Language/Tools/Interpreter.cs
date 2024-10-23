@@ -15,23 +15,34 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 {
     public static Interpreter? Current { get; private set; }
 
-    public Dictionary<string, Type> Variables { get; init; } = [];
-    public Dictionary<string, StructureDeclarationStatement> Structures { get; init; } = [];
+
+    public Environment Environment { get; private set; }
 
 
     public Interpreter()
     {
         Current = this;
+        Environment = new();
     }
 
 
     public void Interpret(Statement statement)
         => statement.Process(this);
 
-    public void Interpret(List<Statement> statements)
+    public void Interpret(List<Statement> statements, Environment? environment = null)
     {
-        foreach (Statement statement in statements)
+        Environment previous = Environment;
+        Environment = environment ?? new();
+
+        try
+        {
+            foreach (Statement statement in statements)
             statement.Process(this);
+        }
+        finally
+        {
+            Environment = previous;
+        }
     }
 
     public Type Interpret(Expression expression)
@@ -48,7 +59,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessBlockStatement(BlockStatement statement)
     {
-        Interpret(statement.Statements);
+        Interpret(statement.Statements, new(Environment));
         return null;
     }
 
@@ -60,8 +71,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessVarDeclarationStatement(VarDeclarationStatement statement)
     {
-        if (Variables.ContainsKey(statement.Name.Lexeme))
-            throw NewError("Variable already declared.", statement.Name);
+        if (Environment.Exists(statement.Name.Lexeme))
+            throw NewError("Identifier has already been declared.", statement.Name);
 
         Type variable;
         object? value = statement.Value is Expression validValue ? Interpret(validValue).Value : null;
@@ -71,7 +82,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         else
             variable = new(value);
 
-        Variables.Add(statement.Name.Lexeme, variable);
+        Environment.Add(statement.Name.Lexeme, variable);
         return null;
     }
 
@@ -96,7 +107,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
     {
-        Structures.Add(statement.Name.Lexeme, statement);
+        Environment.Structures.Add(statement.Name.Lexeme, statement);
 
         return null;
     }
@@ -113,10 +124,10 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
         string identifierName = expression.Identifier.Lexeme;
 
-        if (!Variables.TryGetValue(identifierName, out Type? value))
+        if (!Environment.TryGet(identifierName, out Type? value))
             throw NewError("Undefined identifier.", expression.Identifier);
 
-        return value;
+        return value!;
     }
 
     // TODO: convert all in-string ' character to "
@@ -125,10 +136,10 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         CanvazLanguage.CurrentRuntimeTokenReference = expression.EqualSign;
 
-        if (!Variables.TryGetValue(expression.Identifier.Lexeme, out Type? value))
+        if (!Environment.TryGet(expression.Identifier.Lexeme, out Type? value))
             throw NewError($"Not defined identifier '{expression.Identifier.Lexeme}'.", expression.Identifier);
 
-        value.Value = Interpret(expression.Value).Value;
+        value!.Value = Interpret(expression.Value).Value;
 
         return value;
     }

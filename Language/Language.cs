@@ -6,6 +6,8 @@ using System.Globalization;
 using Specter.String;
 
 using Canvaz.Language.Exceptions;
+using Canvaz.Language.Definitions;
+using Canvaz.Language.Tools;
 
 
 namespace Canvaz.Language;

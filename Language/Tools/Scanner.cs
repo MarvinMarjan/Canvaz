@@ -135,7 +135,7 @@ public class Scanner
 
     private void Identifier()
     {
-        while (char.IsLetterOrDigit(Peek()))
+        while (char.IsLetterOrDigit(Peek()) && !AtEnd())
             Advance();
 
         Type? value = null;

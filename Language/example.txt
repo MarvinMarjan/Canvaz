@@ -13,4 +13,16 @@ structure Person
     var age: Integer
 }
 
-var person: Person
+var outer = 10
+
+{
+    var inner = 5
+
+    print outer
+    print inner
+
+    outer = -123
+}
+
+print outer
+print inner
