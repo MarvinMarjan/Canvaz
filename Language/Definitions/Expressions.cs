@@ -1,7 +1,7 @@
 using Canvaz.Language.Typing;
 
 
-namespace Canvaz.Language;
+namespace Canvaz.Language.Definitions;
 
 
 public interface IExpressionProcessor<T>

@@ -1,6 +1,8 @@
 using System.Linq;
 
+using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
+using Canvaz.Language.Tools;
 
 
 namespace Canvaz.Language.Typing;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-namespace Canvaz.Language;
+namespace Canvaz.Language.Definitions;
 
 
 public interface IStatementProcessor<T>

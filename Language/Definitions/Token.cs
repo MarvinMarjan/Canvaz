@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Type = Canvaz.Language.Typing.Type;
 
 
-namespace Canvaz.Language;
+namespace Canvaz.Language.Definitions;
 
 
 /// <summary>

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 
+using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
 
 
-namespace Canvaz.Language;
+namespace Canvaz.Language.Tools;
 
 
 public class Parser

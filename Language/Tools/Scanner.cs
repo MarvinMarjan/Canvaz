@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 
+using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
 using Canvaz.Language.Typing;
+
+
 using Type = Canvaz.Language.Typing.Type;
 
 
-namespace Canvaz.Language;
+namespace Canvaz.Language.Tools;
 
 
 public class Scanner
