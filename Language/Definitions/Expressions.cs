@@ -1,4 +1,6 @@
-using Canvaz.Language.Typing;
+using System.Collections.Generic;
+
+using Canvaz.Language.Definitions.Typing;
 
 
 namespace Canvaz.Language.Definitions;
@@ -12,6 +14,7 @@ public interface IExpressionProcessor<T>
     public T ProcessBinaryExpression(BinaryExpression expression);
     public T ProcessUnaryExpression(UnaryExpression expression);
     public T ProcessGroupingExpression(GroupingExpression expression);
+    public T ProcessCallExpression(CallExpression expression);
 }
 
 
@@ -83,4 +86,16 @@ public class GroupingExpression(Expression expression) : Expression
 
     public override T Process<T>(IExpressionProcessor<T> processor)
         => processor.ProcessGroupingExpression(this);
+}
+
+
+public class CallExpression(Expression callee, Token paren, List<Expression> arguments) : Expression
+{
+    public Expression Callee { get; init; } = callee;
+    public Token Paren { get; init; } = paren;
+    public List<Expression> Arguments { get; init; } = arguments;
+
+
+    public override T Process<T>(IExpressionProcessor<T> processor)
+        => processor.ProcessCallExpression(this);
 }

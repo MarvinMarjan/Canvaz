@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
-using Canvaz.Language.Typing;
+using Canvaz.Language.Definitions.Typing;
 
 
-using Type = Canvaz.Language.Typing.Type;
+using Type = Canvaz.Language.Definitions.Typing.Type;
 
 
 namespace Canvaz.Language.Tools;

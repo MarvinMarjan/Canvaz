@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-namespace Canvaz.Language.Typing;
+namespace Canvaz.Language.Definitions.Typing;
 
 
 public class Structure

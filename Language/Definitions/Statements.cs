@@ -10,9 +10,10 @@ public interface IStatementProcessor<T>
     public T ProcessBlockStatement(BlockStatement statement);
     public T ProcessPrintStatement(PrintStatement statement);
     public T ProcessVarDeclarationStatement(VarDeclarationStatement statement);
+    public T ProcessFunctionDeclarationStatement(FunctionDeclarationStatement statement);
+    public T ProcessStructureDeclarationStatement(StructureDeclarationStatement statement);
     public T ProcessIfElseStatement(IfElseStatement statement);
     public T ProcessWhileStatement(WhileStatement statement);
-    public T ProcessStructureDeclarationStatement(StructureDeclarationStatement statement);
 }
 
 
@@ -65,6 +66,29 @@ public class VarDeclarationStatement(Token name, Token? typeName, Expression? va
 }
 
 
+public class FunctionDeclarationStatement(Token name, List<Token> parameters, List<Statement> body) : Statement
+{
+    public Token Name { get; init; } = name;
+    public List<Token> Parameters { get; init; } = parameters;
+    public List<Statement> Body { get; init; } = body;
+
+
+    public override T Process<T>(IStatementProcessor<T> processor)
+        => processor.ProcessFunctionDeclarationStatement(this);
+}
+
+
+public class StructureDeclarationStatement(Token name, List<VarDeclarationStatement> members) : Statement
+{
+    public Token Name { get; set; } = name;
+    public List<VarDeclarationStatement> Members { get; set; } = members;
+
+
+    public override T Process<T>(IStatementProcessor<T> processor)
+        => processor.ProcessStructureDeclarationStatement(this);
+}
+
+
 public class IfElseStatement(Expression condition, Statement thenStatement, Statement? elseStatement = null) : Statement
 {
     public Expression Condition { get; set; } = condition;
@@ -85,15 +109,4 @@ public class WhileStatement(Expression condition, Statement blockStatement) : St
 
     public override T Process<T>(IStatementProcessor<T> processor)
         => processor.ProcessWhileStatement(this);
-}
-
-
-public class StructureDeclarationStatement(Token name, List<VarDeclarationStatement> members) : Statement
-{
-    public Token Name { get; set; } = name;
-    public List<VarDeclarationStatement> Members { get; set; } = members;
-
-
-    public override T Process<T>(IStatementProcessor<T> processor)
-        => processor.ProcessStructureDeclarationStatement(this);
 }

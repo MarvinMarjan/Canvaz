@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Canvaz.Language.Typing;
+namespace Canvaz.Language.Definitions.Typing;
 
 
 public partial class Type

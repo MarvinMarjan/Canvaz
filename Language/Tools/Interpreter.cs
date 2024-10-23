@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Canvaz.Language.Definitions;
+using Canvaz.Language.Definitions.Typing;
 using Canvaz.Language.Exceptions;
 
 
-using Type = Canvaz.Language.Typing.Type;
+using Type = Canvaz.Language.Definitions.Typing.Type;
 
 
 namespace Canvaz.Language.Tools;
@@ -57,17 +59,20 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         return null;
     }
 
+
     public object? ProcessBlockStatement(BlockStatement statement)
     {
         Interpret(statement.Statements, new(Environment));
         return null;
     }
 
+
     public object? ProcessPrintStatement(PrintStatement statement)
     {
         Console.WriteLine(Interpret(statement.Value)?.ToString());
         return null;
     }
+
 
     public object? ProcessVarDeclarationStatement(VarDeclarationStatement statement)
     {
@@ -86,6 +91,24 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         return null;
     }
 
+
+    public object? ProcessFunctionDeclarationStatement(FunctionDeclarationStatement statement)
+    {
+        Function function = new(statement);
+        Environment.Add(statement.Name.Lexeme, new(function));
+
+        return null;
+    }
+
+
+    public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
+    {
+        Environment.Structures.Add(statement.Name.Lexeme, statement);
+
+        return null;
+    }
+
+
     public object? ProcessIfElseStatement(IfElseStatement statement)
     {
         if (Interpret(statement.Condition).IsTruthy())
@@ -97,17 +120,11 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         return null;
     }
 
+
     public object? ProcessWhileStatement(WhileStatement statement)
     {
         while (Interpret(statement.Condition).IsTruthy())
             Interpret(statement.BlockStatement);
-
-        return null;
-    }
-
-    public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
-    {
-        Environment.Structures.Add(statement.Name.Lexeme, statement);
 
         return null;
     }
@@ -117,6 +134,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public Type ProcessLiteralExpression(LiteralExpression expression)
         => expression.Value;
+
 
     public Type ProcessIdentifierExpression(IdentifierExpression expression)
     {
@@ -143,6 +161,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
         return value;
     }
+
 
     public Type ProcessBinaryExpression(BinaryExpression expression)
     {
@@ -173,6 +192,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         };
     }
 
+
     public Type ProcessUnaryExpression(UnaryExpression expression)
     {
         Type right = Interpret(expression.Right);
@@ -188,9 +208,25 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
             _ => throw NewError("Invalid unary expression.", expression.Operator),
         };
     }
+
+    // TODO: update runtime token reference
     
     public Type ProcessGroupingExpression(GroupingExpression expression)
         => Interpret(expression.Expression);
+
+    public Type ProcessCallExpression(CallExpression expression)
+    {
+        Type callee = Interpret(expression.Callee);
+        List<Type> arguments = (from argument in expression.Arguments select Interpret(argument)).ToList();
+    
+        if (callee.Value is not ICallable function)
+            throw NewError("Can't call a non-callable value.");
+
+        if (arguments.Count < function.Arity)
+            throw NewError($"Expected {function.Arity} arguments, got {arguments.Count}.");
+
+        return function.Call(this, arguments);
+    }
 
 
     private static CanvazLangException NewError(string message, Token? token = null)

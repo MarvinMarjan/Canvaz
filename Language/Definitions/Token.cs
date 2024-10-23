@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-using Type = Canvaz.Language.Typing.Type;
+using Type = Canvaz.Language.Definitions.Typing.Type;
 
 
 namespace Canvaz.Language.Definitions;
@@ -32,8 +32,8 @@ public enum TokenType
 
     Not, And, Or,
     Typeof,
-    Print, Var,
-    Structure,
+    Print,
+    Var, Function, Structure,
     If, Else, While,
 }
 
@@ -72,6 +72,7 @@ public readonly struct Token(string lexeme, int start, int end, int line, TokenT
         new("null", TokenType.Null),
         new("print", TokenType.Print),
         new("var", TokenType.Var),
+        new("function", TokenType.Function),
         new("structure", TokenType.Structure),
         new("if", TokenType.If),
         new("else", TokenType.Else),

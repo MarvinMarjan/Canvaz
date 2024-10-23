@@ -48,6 +48,7 @@ public class Parser
         TokenType tokenType = Advance().Type;
 
         if (tokenType == TokenType.Var) return VarDeclarationStatement();
+        if (tokenType == TokenType.Function) return FunctionDeclarationStatement();
         if (tokenType == TokenType.Structure) return StructureDeclarationStatement();
 
         Retreat();
@@ -102,6 +103,50 @@ public class Parser
     }
 
 
+    private FunctionDeclarationStatement FunctionDeclarationStatement()
+    {
+        Token name = Expect(TokenType.Identifier, "Expect function name.");
+        
+        Expect(TokenType.ParenLeft, "Expect '(' after fuction name.");
+
+        List<Token> parameters = [];
+        
+        if (!Check(TokenType.ParenRight))
+            do
+            {
+                if (parameters.Count >= 32)
+                    throw NewError("Can't have more than 32 parameters.");
+
+                parameters.Add(Expect(TokenType.Identifier, "Expect parameter."));
+            } while (Match(TokenType.Comma));
+        
+        Expect(TokenType.ParenRight, "Expect ')' after parameters.");
+        Expect(TokenType.BraceLeft, "Expect '{' before function body.");
+
+        List<Statement> body = Block();
+
+        return new(name, parameters, body);
+    }
+
+
+    private StructureDeclarationStatement StructureDeclarationStatement()
+    {
+        Token name = Expect(TokenType.Identifier, "Structure name expected.");
+        List<VarDeclarationStatement> varDeclarations = [];
+
+        Expect(TokenType.BraceLeft, "Expect '{' after structure name.");
+
+        while (!Check(TokenType.BraceRight) && !AtEnd())
+        {
+            Advance();
+            varDeclarations.Add(VarDeclarationStatement());
+        }
+
+        Expect(TokenType.BraceRight, "Expect '}' after structure body.");
+        return new(name, varDeclarations);
+    }
+
+
     private IfElseStatement IfElseStatement()
     {
         Expression condition = Expression();
@@ -121,24 +166,6 @@ public class Parser
         Statement statement = Statement();
 
         return new(condition, statement);
-    }
-
-
-    private StructureDeclarationStatement StructureDeclarationStatement()
-    {
-        Token name = Expect(TokenType.Identifier, "Structure name expected.");
-        List<VarDeclarationStatement> varDeclarations = [];
-
-        Expect(TokenType.BraceLeft, "Expect '{' after structure name.");
-
-        while (!Check(TokenType.BraceRight) && !AtEnd())
-        {
-            Advance();
-            varDeclarations.Add(VarDeclarationStatement());
-        }
-
-        Expect(TokenType.BraceRight, "Expect '}' after structure body.");
-        return new(name, varDeclarations);
     }
 
 
@@ -258,7 +285,43 @@ public class Parser
             return new UnaryExpression(@operator, right);
         }
 
-        return Primary();
+        return Call();
+    }
+
+
+    private Expression Call()
+    {
+        Expression expression = Primary();
+
+        while (true)
+        {
+            if (Match(TokenType.ParenLeft))
+                expression = FinishCall(expression);
+            else
+                break;
+        }
+
+        return expression;
+    }
+
+
+    private CallExpression FinishCall(Expression expression)
+    {
+        List<Expression> arguments = [];
+    
+        if (!Check(TokenType.ParenRight))
+            do
+            {
+                if (arguments.Count >= 32)
+                    throw NewError("Can't have more than 32 arguments");
+
+                arguments.Add(Expression());
+            }
+            while (Match(TokenType.Comma));
+    
+        Token paren = Expect(TokenType.ParenRight, "')' expected after function arguments.");
+
+        return new CallExpression(expression, paren, arguments);
     }
 
 
@@ -301,6 +364,11 @@ public class Parser
             {
                 case TokenType.Print:
                 case TokenType.Var:
+                case TokenType.Function:
+                case TokenType.Structure:
+                case TokenType.If:
+                case TokenType.Else:
+                case TokenType.While:
                     return;
             }
 

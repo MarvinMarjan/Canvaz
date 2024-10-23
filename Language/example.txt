@@ -13,16 +13,10 @@ structure Person
     var age: Integer
 }
 
-var outer = 10
 
-{
-    var inner = 5
-
-    print outer
-    print inner
-
-    outer = -123
+function greet(name) {
+    print "Hello, " + name + "!"
 }
 
-print outer
-print inner
+
+greet()

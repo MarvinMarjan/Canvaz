@@ -1,17 +1,16 @@
 using System.Linq;
 
-using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
 using Canvaz.Language.Tools;
 
 
-namespace Canvaz.Language.Typing;
+namespace Canvaz.Language.Definitions.Typing;
 
 
 public class TypeName
 {
     public static string[] Primitives { get; private set; } = [
-        "String", "Boolean", "Float", "Integer", "UInteger"
+        "String", "Boolean", "Float", "Integer", "UInteger", "Function"
     ];
 
 
@@ -87,6 +86,8 @@ public class TypeName
         int => new("Integer"),
         uint => new("UInteger"),
 
+        Function => new($"Function"),
+
         StructureDeclarationStatement structure => new(structure.Name.Lexeme),
 
         _ => throw InvalidType(value.GetType().Name)
@@ -110,6 +111,10 @@ public class TypeName
 
         if (typeof(T) == typeof(uint))
             return new("UInteger");
+
+
+        if (typeof(T) == typeof(Function))
+            return new("Function");
 
 
         throw InvalidType(typeof(T).Name);

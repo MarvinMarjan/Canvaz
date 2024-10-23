@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
-using Canvaz.Language.Typing;
+using Canvaz.Language.Definitions.Typing;
 
 
 namespace Canvaz.Language.Tools;

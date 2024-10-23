@@ -1,8 +1,7 @@
-using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
 
 
-namespace Canvaz.Language.Typing;
+namespace Canvaz.Language.Definitions.Typing;
 
 
 public partial class Type
