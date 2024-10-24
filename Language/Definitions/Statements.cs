@@ -1,6 +1,8 @@
+using System.Linq;
 using System.Collections.Generic;
-using System.Net.Mime;
+
 using Canvaz.Language.Definitions.Typing;
+using System;
 
 
 namespace Canvaz.Language.Definitions;
@@ -8,6 +10,8 @@ namespace Canvaz.Language.Definitions;
 
 public interface IStatementProcessor<T>
 {
+    public T ProcessInternalStatement(InternalStatement statement);
+
     public T ProcessExpressionStatement(ExpressionStatement statement);
     public T ProcessBlockStatement(BlockStatement statement);
     public T ProcessPrintStatement(PrintStatement statement);
@@ -23,6 +27,16 @@ public interface IStatementProcessor<T>
 public abstract class Statement
 {
     public abstract T Process<T>(IStatementProcessor<T> processor);
+}
+
+
+public class InternalStatement(Action action) : Statement
+{
+    public Action Action { get; init; } = action;
+
+
+    public override T Process<T>(IStatementProcessor<T> processor)
+        => processor.ProcessInternalStatement(this);
 }
 
 
@@ -64,9 +78,15 @@ public class VarDeclarationStatement(Token name, Token? typeName, Token? equalSi
     public Expression? Value { get; init; } = value;
 
 
+    public VarDeclaration Simplify()
+        => new(Name.Lexeme, new(TypeName?.Lexeme ?? "Any"), Value);
+
+
     public override T Process<T>(IStatementProcessor<T> processor)
         => processor.ProcessVarDeclarationStatement(this);
 }
+
+public readonly record struct VarDeclaration(string Name, TypeName TypeName, Expression? Value);
 
 
 public class FunctionDeclarationStatement(Token name, List<VarDeclarationStatement> parameters, Token? returnType, List<Statement> body) : Statement
@@ -97,6 +117,10 @@ public class StructureDeclarationStatement(Token name, Dictionary<string, VarDec
 {
     public Token Name { get; init; } = name;
     public Dictionary<string, VarDeclarationStatement> Members { get; init; } = members;
+
+
+    public StructureDeclaration Simplify()
+        => new(Name.Lexeme, (from member in Members select new KeyValuePair<string, VarDeclaration>(member.Key, member.Value.Simplify())).ToDictionary());
 
 
     public override T Process<T>(IStatementProcessor<T> processor)

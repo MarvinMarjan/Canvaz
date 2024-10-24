@@ -19,15 +19,43 @@ public class Return(Type value, Token keyword) : Exception
 }
 
 
-public class Function(string name, List<VarDeclarationStatement> parameters, Token? returnTypeToken, List<Statement> body) : ICallable
+public class Function(string name, List<VarDeclaration> parameters, TypeName? returnType, List<Statement> body) : ICallable
 {
     public string Name { get; init; } = name;
-    public List<VarDeclarationStatement> Parameters { get; init; } = parameters;
-    public Token? ReturnTypeToken { get; init; } = returnTypeToken;
+    public List<VarDeclaration> Parameters { get; init; } = parameters;
+    public TypeName? ReturnTypeToken { get; init; } = returnType;
     public List<Statement> Body { get; init; } = body;
 
 
-    public TypeName? ReturnType { get; init; } = returnTypeToken is Token valid ? new(valid.Lexeme) : null;
+    public TypeName? ReturnType { get; init; } = returnType;
+
+
+    public static Function FromStatement(FunctionDeclarationStatement statement)
+    {
+        List<VarDeclaration> parameters = (from parameter in statement.Parameters select parameter.Simplify()).ToList();
+        TypeName? typeName = null;
+
+        if (statement.ReturnType is not null)
+            typeName = statement.ReturnType.Value.Lexeme;
+
+        return new(statement.Name.Lexeme, parameters, typeName, statement.Body);
+    }
+
+
+    public static Function FromExpression(AnonymousFunctionExpression expression)
+    {
+        List<VarDeclaration> parameters = (from parameter in expression.Parameters select parameter.Simplify()).ToList();
+        TypeName? typeName = null;
+
+        if (expression.ReturnType is not null)
+            typeName = expression.ReturnType.Value.Lexeme;
+
+        return NewAnonymous(parameters, typeName, expression.Body);
+    }
+
+
+    public static Function NewAnonymous(List<VarDeclaration> parameters, TypeName? returnType, List<Statement> body)
+        => new("anonymous", parameters, returnType, body);
 
 
     public Type Call(Interpreter interpreter, List<Type> arguments)
@@ -36,10 +64,10 @@ public class Function(string name, List<VarDeclarationStatement> parameters, Tok
     
         for (int i = 0; i < Parameters.Count; i++)
         {
-            VarDeclarationStatement parameterDeclaration = Parameters[i];
+            VarDeclaration parameterDeclaration = Parameters[i];
             Type argument = MatchArgumentWithParameter(interpreter, parameterDeclaration, i >= arguments.Count ? null : arguments[i]);
             
-            newEnvironment.Add(parameterDeclaration.Name.Lexeme, argument);
+            newEnvironment.Add(parameterDeclaration.Name, argument);
         }
 
         Type? returnValue = ReturnType is not null ? new(null, ReturnType) : null;
@@ -60,22 +88,17 @@ public class Function(string name, List<VarDeclarationStatement> parameters, Tok
     }
 
 
-    private static Type MatchArgumentWithParameter(Interpreter interpreter, VarDeclarationStatement parameterDeclaration, Type? argument)
+    private static Type MatchArgumentWithParameter(Interpreter interpreter, VarDeclaration parameterDeclaration, Type? argument)
     {
-        Type parameter;
         object? value;
 
+        // default value
         if (argument is null) // no need to check nullability of "Value"
             value = interpreter.Interpret(parameterDeclaration.Value!).Value;
         else
             value = argument.Value;
 
-        if (parameterDeclaration.TypeName is Token validTypeName)
-            parameter = new(value, new(validTypeName.Lexeme));
-        else
-            parameter = new(value);
-    
-        return parameter;
+        return new(value, parameterDeclaration.TypeName);
     }
 
 

@@ -56,11 +56,13 @@ public static class CanvazLanguage
             if (HasError)
                 return;
 
-            new Interpreter().Interpret(statements);
+            Interpreter.Current.Interpret(statements, Interpreter.Current.Environment);
         }
         catch (Exception e)
         {
             Error(e);
+            
+            //throw;
         }
     }
 

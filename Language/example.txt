@@ -1,39 +1,7 @@
-#< var myrect = Rectangle{
-    NameId: "MyRect",
-    Position: Vec2f{100.123, 200f},
-    Size: Vec2f{100f, 100}
-    Rotation: 0f,
-    Color: RGB{255, 0, 255},
-} >#
+start(EngineSettings{
+    windowTitle: "Test Window Title",
+    windowSize: Vec2u{ x: 1000u, y: 700u }
+})
 
-
-structure Person
-{
-    var name: String
-    var age: Integer
-    var happy: Boolean = true
-
-    var show = function(person) {
-        print "showing: " + person.name
-    }
-}
-
-function Person(name: String, age: Integer): Person {
-    return Person{ name: name, age: age }
-}
-
-
-var peter = Person{
-    age: 24,
-    name: "Peter Parker"
-}
-
-var marvin = Person("Marvin Marjan", 15)
-
-
-var myfunc = function(text: String) {
-    print text
-}
-
-peter->show()
-marvin->show()
+while true
+    update()

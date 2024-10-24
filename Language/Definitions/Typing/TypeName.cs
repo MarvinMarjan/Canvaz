@@ -34,6 +34,10 @@ public class TypeName
     }
 
 
+    public static implicit operator TypeName(string typeName)
+        => new(typeName);
+
+
     public bool Is<T>() => this == FromGeneric<T>();
 
 
@@ -59,12 +63,12 @@ public class TypeName
         => new(null, $"Type \"{name}\" doesn't exists.");
 
 
-    public static bool TypeExists(string name)
+    public bool TypeExists(string name)
     {
         if (Primitives.Contains(name))
             return true;
 
-        return Interpreter.Current?.Environment.Structures.ContainsKey(name) ?? false;
+        return Interpreter.Current.Environment.Structures.ContainsKey(name);
     }
 
 

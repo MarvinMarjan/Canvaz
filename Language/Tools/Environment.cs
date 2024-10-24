@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-using Canvaz.Language.Definitions;
 using Canvaz.Language.Exceptions;
 using Canvaz.Language.Definitions.Typing;
+using Canvaz.Language.Definitions;
 
 
 namespace Canvaz.Language.Tools;
@@ -11,7 +11,7 @@ namespace Canvaz.Language.Tools;
 public class Environment
 {
     private Dictionary<string, Type> _data = [];
-    public Dictionary<string, StructureDeclarationStatement> Structures { get; init; } = [];
+    public Dictionary<string, StructureDeclaration> Structures { get; set; } = [];
 
 
     public Environment? Enclosing { get; private set; }
@@ -32,12 +32,19 @@ public class Environment
     }
 
 
-    public void AddStructure(string name, StructureDeclarationStatement declaration)
+    public void AddStructure(string name, StructureDeclaration declaration)
     {
         if (ExistsStructure(name))
             throw NewError($"Structure \"{name}\" has already been defined.");
 
         Structures.Add(name, declaration);
+    }
+
+
+    public void AddStructures(Dictionary<string, StructureDeclaration> structures)
+    {
+        foreach (var (key, value) in structures)
+            AddStructure(key, value);
     }
 
 
@@ -53,9 +60,9 @@ public class Environment
     }
 
 
-    public StructureDeclarationStatement GetStructure(string name)
+    public StructureDeclaration GetStructure(string name)
     {
-        if (Structures.TryGetValue(name, out StructureDeclarationStatement? structure))
+        if (Structures.TryGetValue(name, out StructureDeclaration structure))
             return structure;
 
         if (Enclosing is not null)
@@ -80,7 +87,7 @@ public class Environment
     }
 
 
-    public bool TryGetStructure(string name, out StructureDeclarationStatement? structure)
+    public bool TryGetStructure(string name, out StructureDeclaration? structure)
     {
         try
         {
@@ -104,11 +111,24 @@ public class Environment
 
 
     public bool Exists(string name)
-        => _data.ContainsKey(name);
+    {
+        bool exists = _data.ContainsKey(name);
+    
+        if (!exists && Enclosing is not null)
+            return Enclosing.Exists(name);
 
+        return exists;
+    }
     
     public bool ExistsStructure(string name)
-        => Structures.ContainsKey(name);
+    {
+        bool exists = Structures.ContainsKey(name);
+    
+        if (!exists && Enclosing is not null)
+            return Enclosing.ExistsStructure(name);
+
+        return exists;
+    }
 
 
     private static CanvazLangException NewError(string msg)

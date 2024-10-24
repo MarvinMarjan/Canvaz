@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Canvaz.Engine;
+
 using Canvaz.Language.Definitions;
 using Canvaz.Language.Definitions.Typing;
 using Canvaz.Language.Exceptions;
@@ -15,16 +17,32 @@ namespace Canvaz.Language.Tools;
 
 public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<object?>
 {
-    public static Interpreter? Current { get; private set; }
-
+    public static Interpreter Current { get; private set; } = new();
 
     public Environment Environment { get; private set; }
 
 
-    public Interpreter()
+    public EngineApp? Engine { get; private set; }
+
+
+    private Interpreter()
     {
         Current = this;
+
         Environment = new();
+        StdLibrary.AddLibraryTo(Environment);
+    }
+
+
+    public void Start(string title)
+    {
+        Engine = new(title, new());
+    }
+
+    public void UpdateAndDraw()
+    {
+        Engine?.Update();
+        Engine?.Draw();
     }
 
 
@@ -51,6 +69,13 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         => expression.Process(this);
 
 
+
+
+    public object? ProcessInternalStatement(InternalStatement statement)
+    {
+        statement.Action();
+        return null;
+    }
 
 
     public object? ProcessExpressionStatement(ExpressionStatement statement)
@@ -96,16 +121,14 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessFunctionDeclarationStatement(FunctionDeclarationStatement statement)
     {
-        Function function = new(statement.Name.Lexeme, statement.Parameters, statement.ReturnType, statement.Body);
-        Environment.Add(statement.Name.Lexeme, new(function));
-
+        Environment.Add(statement.Name.Lexeme, new(Function.FromStatement(statement)));
         return null;
     }
 
 
     public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
     {
-        Environment.AddStructure(statement.Name.Lexeme, statement);
+        Environment.AddStructure(statement.Name.Lexeme, statement.Simplify());
 
         return null;
     }
@@ -276,12 +299,12 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         Token structureName = expression.StructureName;
 
-        if (!Environment.TryGetStructure(expression.StructureName.Lexeme, out StructureDeclarationStatement? structureDeclaration))
+        if (!Environment.TryGetStructure(expression.StructureName.Lexeme, out StructureDeclaration? structureDeclaration))
             throw NewError($"Structure \"{structureName.Lexeme}\" is not defined.", structureName);
 
         Structure structure = new(structureName.Lexeme);
 
-        foreach (var (name, varDeclaration) in structureDeclaration!.Members)
+        foreach (var (name, varDeclaration) in structureDeclaration!.Value.Members)
         {
             if (!expression.InitializationPairs.TryGetValue(name, out StructureInitializationPair init))
             {
@@ -291,7 +314,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
                     structure.Members.Add(name, new(Interpret(varDeclaration.Value).Value));
             }
             else
-                structure.Members.Add(name, new(Interpret(init.Value).Value, new(varDeclaration.TypeName?.Lexeme ?? "Any")));
+                structure.Members.Add(name, new(Interpret(init.Value).Value, varDeclaration.TypeName));
         }
 
         return new(structure);
@@ -299,11 +322,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
 
     public Type ProcessAnonymousFunctionExpression(AnonymousFunctionExpression expression)
-    {
-        Function function = new("anonymous", expression.Parameters, expression.ReturnType, expression.Body);
-
-        return new(function);
-    }
+        => new(Function.FromExpression(expression));
 
 
     private static CanvazLangException NewError(string message, Token? token = null)
