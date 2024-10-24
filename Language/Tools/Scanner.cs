@@ -72,7 +72,7 @@ public class Scanner
             break;
 
         case '+': AddToken(TokenType.Plus); break;
-        case '-': AddToken(TokenType.Minus); break;
+        case '-': AddToken(Match('>') ? TokenType.DashArrow : TokenType.Minus); break;
         case '*': AddToken(TokenType.Asterisk); break;
         case '/': AddToken(TokenType.Slash); break;
         

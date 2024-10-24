@@ -19,20 +19,24 @@ public class Return(Type value, Token keyword) : Exception
 }
 
 
-public class Function(FunctionDeclarationStatement declaration) : ICallable
+public class Function(string name, List<VarDeclarationStatement> parameters, Token? returnTypeToken, List<Statement> body) : ICallable
 {
-    public FunctionDeclarationStatement Declaration { get; init; } = declaration;
+    public string Name { get; init; } = name;
+    public List<VarDeclarationStatement> Parameters { get; init; } = parameters;
+    public Token? ReturnTypeToken { get; init; } = returnTypeToken;
+    public List<Statement> Body { get; init; } = body;
 
-    public TypeName? ReturnType { get; init; } = declaration.ReturnType is Token valid ? new(valid.Lexeme) : null;
+
+    public TypeName? ReturnType { get; init; } = returnTypeToken is Token valid ? new(valid.Lexeme) : null;
 
 
     public Type Call(Interpreter interpreter, List<Type> arguments)
     {
         Environment newEnvironment = new(interpreter.Environment);
     
-        for (int i = 0; i < Declaration.Parameters.Count; i++)
+        for (int i = 0; i < Parameters.Count; i++)
         {
-            VarDeclarationStatement parameterDeclaration = Declaration.Parameters[i];
+            VarDeclarationStatement parameterDeclaration = Parameters[i];
             Type argument = MatchArgumentWithParameter(interpreter, parameterDeclaration, i >= arguments.Count ? null : arguments[i]);
             
             newEnvironment.Add(parameterDeclaration.Name.Lexeme, argument);
@@ -42,7 +46,7 @@ public class Function(FunctionDeclarationStatement declaration) : ICallable
 
         try
         {
-            interpreter.Interpret(Declaration.Body, newEnvironment);
+            interpreter.Interpret(Body, newEnvironment);
         }
         catch (Return ret)
         {
@@ -76,10 +80,10 @@ public class Function(FunctionDeclarationStatement declaration) : ICallable
 
 
     private int CountParametersWithDefaultValues()
-        => (from parameter in Declaration.Parameters
+        => (from parameter in Parameters
                 where parameter.Value is not null
                 select parameter).Count();
 
 
-    public int Arity => Declaration.Parameters.Count - CountParametersWithDefaultValues();
+    public int Arity => Parameters.Count - CountParametersWithDefaultValues();
 }

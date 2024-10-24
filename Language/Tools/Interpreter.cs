@@ -96,7 +96,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessFunctionDeclarationStatement(FunctionDeclarationStatement statement)
     {
-        Function function = new(statement);
+        Function function = new(statement.Name.Lexeme, statement.Parameters, statement.ReturnType, statement.Body);
         Environment.Add(statement.Name.Lexeme, new(function));
 
         return null;
@@ -193,6 +193,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
             TokenType.And => left && right,
             TokenType.Or => left || right,
 
+
             _ => throw NewError("Invalid binary expression.", expression.Operator),
         };
     }
@@ -242,7 +243,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     public Type ProcessGetExpression(GetExpression expression)
     {
         if (Interpret(expression.Object).Value is not Structure structure)
-            throw NewError("Can't use \".\" with a non-structure value.");
+            throw NewError("Can't get members of a non-structure value.");
 
         if (!structure.Members.TryGetValue(expression.Member.Lexeme, out Type? value))
             throw NewError($"Member \"{expression.Member.Lexeme}\" not defined.", expression.Member);
@@ -256,7 +257,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     public Type ProcessSetExpression(SetExpression expression)
     {
         if (Interpret(expression.Object).Value is not Structure structure)
-            throw NewError("Can't use \".\" with a non-structure value.");
+            throw NewError("Can't set members values of a non-structure value.");
 
         if (!structure.Members.TryGetValue(expression.Member.Lexeme, out _))
             throw NewError($"Member \"{expression.Member.Lexeme}\" not defined.", expression.Member);
@@ -279,16 +280,29 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
             throw NewError($"Structure \"{structureName.Lexeme}\" is not defined.", structureName);
 
         Structure structure = new(structureName.Lexeme);
-        
+
         foreach (var (name, varDeclaration) in structureDeclaration.Members)
         {
             if (!expression.InitializationPairs.TryGetValue(name, out StructureInitializationPair init))
-                throw NewError($"Structure member \"{name}\" must be initialized.", structureName);
-
-            structure.Members.Add(name, new(Interpret(init.Value).Value, new(varDeclaration.TypeName?.Lexeme ?? "Any")));
+            {
+                if (varDeclaration.Value is null)
+                    throw NewError($"Structure member \"{name}\" must be initialized.", structureName);
+                else
+                    structure.Members.Add(name, new(Interpret(varDeclaration.Value).Value));
+            }
+            else
+                structure.Members.Add(name, new(Interpret(init.Value).Value, new(varDeclaration.TypeName?.Lexeme ?? "Any")));
         }
 
         return new(structure);
+    }
+
+
+    public Type ProcessAnonymousFunctionExpression(AnonymousFunctionExpression expression)
+    {
+        Function function = new("anonymous", expression.Parameters, expression.ReturnType, expression.Body);
+
+        return new(function);
     }
 
 

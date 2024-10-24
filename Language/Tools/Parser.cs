@@ -112,7 +112,15 @@ public class Parser
     private FunctionDeclarationStatement FunctionDeclarationStatement()
     {
         Token name = Expect(TokenType.Identifier, "Expect function name.");
-        
+        List<VarDeclarationStatement> parameters = ParseFunctionParameters();
+        Token? returnType = ParseFunctionReturnType();
+        List<Statement> body = ParseFunctionBody();
+
+        return new(name, parameters, returnType, body);
+    }
+
+    private List<VarDeclarationStatement> ParseFunctionParameters()
+    {
         Expect(TokenType.ParenLeft, "Expect \"(\" after fuction name.");
 
         List<VarDeclarationStatement> parameters = [];
@@ -132,16 +140,24 @@ public class Parser
         
         Expect(TokenType.ParenRight, "Expect \")\" after parameters.");
 
+        return parameters;
+    }
+
+    private Token? ParseFunctionReturnType()
+    {
         Token? returnType = null;
 
         if (Match(TokenType.Colon))
             returnType = Expect(TokenType.Identifier, "Expect return type after \":\".");
+    
+        return returnType;
+    }
 
+    private List<Statement> ParseFunctionBody()
+    {
         Expect(TokenType.BraceLeft, "Expect \"{\" before function body.");
 
-        List<Statement> body = Block();
-
-        return new(name, parameters, returnType, body);
+        return Block();
     }
 
 
@@ -314,7 +330,53 @@ public class Parser
             return new UnaryExpression(@operator, right);
         }
 
-        return Call();
+        return MemberForward();
+    }
+
+
+    // abc->func() = abc.func(abc)
+    private Expression MemberForward()
+    {
+        Expression expression = Forward();
+
+        while (Match(TokenType.DashArrow))
+        {
+            Expression right = Forward();
+
+            if (right is not CallExpression call)
+                throw NewError("Can't use operator \"->\" with non-callable values.");
+
+            if (call.Callee is not IdentifierExpression identifier)
+                throw NewError("Right sided callable value should call a identifier directly.");
+
+            call.Arguments.Insert(0, expression);
+
+            GetExpression getExpression = new(expression, identifier.Identifier);
+
+            expression = new CallExpression(getExpression, call.Paren, call.Arguments);
+        }
+
+        return expression;
+    }
+
+
+    // abc:func() = func(abc)
+    private Expression Forward()
+    {
+        Expression expression = Call();
+
+        while (Match(TokenType.Colon))
+        {
+            Expression right = Call();
+
+            if (right is not CallExpression call)
+                throw NewError("Can't use operator \":\" with non-callable values.");
+
+            call.Arguments.Insert(0, expression);
+            expression = call;
+        }
+
+        return expression;
     }
 
 
@@ -374,6 +436,9 @@ public class Parser
 
             return new IdentifierExpression(identifier);
         }
+
+        if (Match(TokenType.Function))
+            return new AnonymousFunctionExpression(ParseFunctionParameters(), ParseFunctionReturnType(), ParseFunctionBody());
 
         if (Match(TokenType.ParenLeft))
             return ParseGroupingExpression();

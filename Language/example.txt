@@ -11,6 +11,11 @@ structure Person
 {
     var name: String
     var age: Integer
+    var happy: Boolean = true
+
+    var show = function(person) {
+        print "showing: " + person.name
+    }
 }
 
 
@@ -20,4 +25,8 @@ var peter = Person{
 }
 
 
-peter.asd = 1
+var myfunc = function(text: String) {
+    print text
+}
+
+peter.name->show()

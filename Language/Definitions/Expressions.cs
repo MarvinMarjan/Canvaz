@@ -18,6 +18,7 @@ public interface IExpressionProcessor<T>
     public T ProcessGetExpression(GetExpression expression);
     public T ProcessSetExpression(SetExpression expression);
     public T ProcessStructureInitializationExpression(StructureInitializationExpression expression);
+    public T ProcessAnonymousFunctionExpression(AnonymousFunctionExpression expression);
 }
 
 
@@ -138,3 +139,17 @@ public class StructureInitializationExpression(Token structureName, Dictionary<s
         => processor.ProcessStructureInitializationExpression(this);
 }
 
+
+public class AnonymousFunctionExpression(List<VarDeclarationStatement> parameters, Token? returnType, List<Statement> body) : Expression
+{
+    public List<VarDeclarationStatement> Parameters { get; init; } = parameters;
+    public Token? ReturnType { get; init; } = returnType;
+    public List<Statement> Body { get; init; } = body;
+
+
+    public override T Process<T>(IExpressionProcessor<T> processor)
+        => processor.ProcessAnonymousFunctionExpression(this);
+}
+
+
+/* public class ForwardingExpression(Expression left, Expression) */

@@ -58,7 +58,7 @@ public partial class Type
             text = $"Structure \"{typeName}\"";
 
         if (typeName == "Function")
-            text = $"Function \"{(Value as Function)!.Declaration.Name.Lexeme}\"";
+            text = $"Function \"{(Value as Function)!.Name}\"";
 
         text = text is "True" or "False" ? text.ToLower() : text; // booleans should be on lower case.
 
