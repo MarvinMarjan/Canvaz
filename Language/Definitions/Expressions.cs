@@ -26,7 +26,7 @@ public abstract class Expression
 
 public class LiteralExpression(Type value) : Expression
 {
-    public Type Value { get; set; } = value;
+    public Type Value { get; init; } = value;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)
@@ -36,7 +36,7 @@ public class LiteralExpression(Type value) : Expression
 
 public class IdentifierExpression(Token identifier) : Expression
 {
-    public Token Identifier { get; set; } = identifier;
+    public Token Identifier { get; init; } = identifier;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)
@@ -46,9 +46,9 @@ public class IdentifierExpression(Token identifier) : Expression
 
 public class AssignmentExpression(Token identifier, Token equalSign, Expression value) : Expression
 {
-    public Token Identifier { get; set; } = identifier;
-    public Token EqualSign { get; set; } = equalSign;
-    public Expression Value { get; set; } = value;
+    public Token Identifier { get; init; } = identifier;
+    public Token EqualSign { get; init; } = equalSign;
+    public Expression Value { get; init; } = value;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)
@@ -58,9 +58,9 @@ public class AssignmentExpression(Token identifier, Token equalSign, Expression 
 
 public class BinaryExpression(Expression left, Token @operator, Expression right) : Expression
 {
-    public Expression Left { get; set; } = left;
-    public Token Operator { get; set; } = @operator;
-    public Expression Right { get; set; } = right;
+    public Expression Left { get; init; } = left;
+    public Token Operator { get; init; } = @operator;
+    public Expression Right { get; init; } = right;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)
@@ -70,8 +70,8 @@ public class BinaryExpression(Expression left, Token @operator, Expression right
 
 public class UnaryExpression(Token @operator, Expression right) : Expression
 {
-    public Token Operator { get; set; } = @operator;
-    public Expression Right { get; set; } = right;
+    public Token Operator { get; init; } = @operator;
+    public Expression Right { get; init; } = right;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)
@@ -81,7 +81,7 @@ public class UnaryExpression(Token @operator, Expression right) : Expression
 
 public class GroupingExpression(Expression expression) : Expression
 {
-    public Expression Expression { get; set; } = expression;
+    public Expression Expression { get; init; } = expression;
 
 
     public override T Process<T>(IExpressionProcessor<T> processor)

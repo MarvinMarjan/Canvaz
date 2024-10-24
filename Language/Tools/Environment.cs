@@ -26,7 +26,7 @@ public class Environment
     public void Add(string name, Type value)
     {
         if (Exists(name))
-            throw NewError($"Identifier '{name}' has already been defined.");
+            throw NewError($"Identifier \"{name}\" has already been defined.");
 
         _data.Add(name, value);
     }
@@ -40,7 +40,7 @@ public class Environment
         if (Enclosing is not null)
             return Enclosing.Get(name);
 
-        throw NewError($"Undefined identifier '{name}'");
+        throw NewError($"Undefined identifier \"{name}\"");
     }
 
 

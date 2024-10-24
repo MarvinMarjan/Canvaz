@@ -21,7 +21,7 @@ public partial class Type
             TypeName newTypeName = TypeName.FromValue(value);
 
             if (StaticTyping && newTypeName != TypeName)
-                throw NewError($"Can't assign a static typed variable of type '{TypeName}' a value of type '{newTypeName}'.");
+                throw NewError($"Can't assign a static typed variable of type \"{TypeName}\" a value of type \"{newTypeName}\".");
 
             TypeName = newTypeName;
             _value = value;
@@ -58,7 +58,11 @@ public partial class Type
 
     public override string ToString()
     {
-        string text = Value?.ToString() ?? "null";
+        string text = TypeName.Name switch {
+            "Function" => $"Function \"{(Value as Function)!.Declaration.Name.Lexeme}\"",
+
+            _ => Value?.ToString() ?? "null"
+        };
         text = text is "True" or "False" ? text.ToLower() : text; // booleans should be on lower case.
 
         return text;

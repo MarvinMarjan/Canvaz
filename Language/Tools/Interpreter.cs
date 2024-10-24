@@ -148,14 +148,13 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         return value!;
     }
 
-    // TODO: convert all in-string ' character to "
 
     public Type ProcessAssignmentExpression(AssignmentExpression expression)
     {
         CanvazLanguage.CurrentRuntimeTokenReference = expression.EqualSign;
 
         if (!Environment.TryGet(expression.Identifier.Lexeme, out Type? value))
-            throw NewError($"Not defined identifier '{expression.Identifier.Lexeme}'.", expression.Identifier);
+            throw NewError($"Not defined identifier \"{expression.Identifier.Lexeme}\".", expression.Identifier);
 
         value!.Value = Interpret(expression.Value).Value;
 
@@ -209,7 +208,6 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         };
     }
 
-    // TODO: update runtime token reference
     
     public Type ProcessGroupingExpression(GroupingExpression expression)
         => Interpret(expression.Expression);
@@ -219,6 +217,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         Type callee = Interpret(expression.Callee);
         List<Type> arguments = (from argument in expression.Arguments select Interpret(argument)).ToList();
     
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.Paren;
+
         if (callee.Value is not ICallable function)
             throw NewError("Can't call a non-callable value.");
 

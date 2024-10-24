@@ -63,7 +63,7 @@ public class TypeName
 
 
     public static CanvazLangException InvalidType(string name)
-        => new(null, $"Type '{name}' doesn't exists.");
+        => new(null, $"Type \"{name}\" doesn't exists.");
 
 
     public static bool TypeExists(string name)

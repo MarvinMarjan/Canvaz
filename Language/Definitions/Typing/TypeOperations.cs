@@ -16,7 +16,7 @@ public partial class Type
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l + r);
 
         if (result is null)
-            throw NewError($"'+' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"+\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
 
         return result;
     }
@@ -31,7 +31,7 @@ public partial class Type
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l - r);
 
         if (result is null)
-            throw NewError($"'-' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"-\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -45,7 +45,7 @@ public partial class Type
         UnaryOperation<int, int>(right, ref result, r => -r);
 
         if (result is null)
-            throw NewError($"Unary '-' is not applicable for '{right.TypeName}'.");
+            throw NewError($"Unary \"-\" is not applicable for \"{right.TypeName}\".");
     
         return result;
     }
@@ -64,7 +64,7 @@ public partial class Type
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l * r);
 
         if (result is null)
-            throw NewError($"'*' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"*\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -79,7 +79,7 @@ public partial class Type
         BinaryOperation<uint, uint>(left, right, ref result, (l, r) => l / r);
 
         if (result is null)
-            throw NewError($"'/' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"/\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -124,7 +124,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l > r);
 
         if (result is null)
-            throw NewError($"'>' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\">\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -139,7 +139,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l < r);
 
         if (result is null)
-            throw NewError($"'<' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"<\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -154,7 +154,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l >= r);
 
         if (result is null)
-            throw NewError($"'>=' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\">=\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -169,7 +169,7 @@ public partial class Type
         BinaryOperation<uint, bool>(left, right, ref result, (l, r) => l <= r);
 
         if (result is null)
-            throw NewError($"'<=' is not applicable for '{left.TypeName}' and '{right.TypeName}'.");
+            throw NewError($"\"<=\" is not applicable for \"{left.TypeName}\" and \"{right.TypeName}\".");
     
         return result;
     }
@@ -183,7 +183,7 @@ public partial class Type
         if (TypeName.Is<bool>())
             return AsBoolean();
 
-        throw NewError($"Can't determine truthiness of '{TypeName}'.");
+        throw NewError($"Can't determine truthiness of \"{TypeName}\".");
     }
 
     public bool Equals(Type other)

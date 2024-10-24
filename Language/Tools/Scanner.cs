@@ -81,7 +81,7 @@ public class Scanner
             if (Match('='))
                 AddToken(TokenType.BangEqual);
             else
-                throw NewError("'!' is invalid alone.");
+                throw NewError("\"!\" is invalid alone.");
 
             break;
 

@@ -35,7 +35,7 @@ public class ExpressionStatement(Expression expression) : Statement
 
 public class BlockStatement(List<Statement> statements) : Statement
 {
-    public List<Statement> Statements { get; set; } = statements;
+    public List<Statement> Statements { get; init; } = statements;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)
@@ -52,7 +52,6 @@ public class PrintStatement(Expression value) : Statement
         => processor.ProcessPrintStatement(this);
 }
 
-// TODO: set all properties to "init"
 
 public class VarDeclarationStatement(Token name, Token? typeName, Expression? value) : Statement
 {
@@ -80,8 +79,8 @@ public class FunctionDeclarationStatement(Token name, List<Token> parameters, Li
 
 public class StructureDeclarationStatement(Token name, List<VarDeclarationStatement> members) : Statement
 {
-    public Token Name { get; set; } = name;
-    public List<VarDeclarationStatement> Members { get; set; } = members;
+    public Token Name { get; init; } = name;
+    public List<VarDeclarationStatement> Members { get; init; } = members;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)
@@ -91,9 +90,9 @@ public class StructureDeclarationStatement(Token name, List<VarDeclarationStatem
 
 public class IfElseStatement(Expression condition, Statement thenStatement, Statement? elseStatement = null) : Statement
 {
-    public Expression Condition { get; set; } = condition;
-    public Statement ThenStatement { get; set; } = thenStatement;
-    public Statement? ElseStatement { get; set; } = elseStatement;
+    public Expression Condition { get; init; } = condition;
+    public Statement ThenStatement { get; init; } = thenStatement;
+    public Statement? ElseStatement { get; init; } = elseStatement;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)
@@ -103,8 +102,8 @@ public class IfElseStatement(Expression condition, Statement thenStatement, Stat
 
 public class WhileStatement(Expression condition, Statement blockStatement) : Statement
 {
-    public Expression Condition { get; set; } = condition;
-    public Statement BlockStatement { get; set; } = blockStatement;
+    public Expression Condition { get; init; } = condition;
+    public Statement BlockStatement { get; init; } = blockStatement;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)

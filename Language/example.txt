@@ -19,4 +19,4 @@ function greet(name) {
 }
 
 
-greet()
+print "hello, world"()

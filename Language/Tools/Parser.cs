@@ -78,7 +78,7 @@ public class Parser
         while (!Check(TokenType.BraceRight) && !AtEnd())
             statements.Add(Declaration());
 
-        Expect(TokenType.BraceRight, "Expect '}' to finish a block.");
+        Expect(TokenType.BraceRight, "Expect \"}\" to finish a block.");
         return statements;
     }
 
@@ -107,7 +107,7 @@ public class Parser
     {
         Token name = Expect(TokenType.Identifier, "Expect function name.");
         
-        Expect(TokenType.ParenLeft, "Expect '(' after fuction name.");
+        Expect(TokenType.ParenLeft, "Expect \"(\" after fuction name.");
 
         List<Token> parameters = [];
         
@@ -120,8 +120,8 @@ public class Parser
                 parameters.Add(Expect(TokenType.Identifier, "Expect parameter."));
             } while (Match(TokenType.Comma));
         
-        Expect(TokenType.ParenRight, "Expect ')' after parameters.");
-        Expect(TokenType.BraceLeft, "Expect '{' before function body.");
+        Expect(TokenType.ParenRight, "Expect \")\" after parameters.");
+        Expect(TokenType.BraceLeft, "Expect \"{\" before function body.");
 
         List<Statement> body = Block();
 
@@ -134,7 +134,7 @@ public class Parser
         Token name = Expect(TokenType.Identifier, "Structure name expected.");
         List<VarDeclarationStatement> varDeclarations = [];
 
-        Expect(TokenType.BraceLeft, "Expect '{' after structure name.");
+        Expect(TokenType.BraceLeft, "Expect \"{\" after structure name.");
 
         while (!Check(TokenType.BraceRight) && !AtEnd())
         {
@@ -142,7 +142,7 @@ public class Parser
             varDeclarations.Add(VarDeclarationStatement());
         }
 
-        Expect(TokenType.BraceRight, "Expect '}' after structure body.");
+        Expect(TokenType.BraceRight, "Expect \"}\" after structure body.");
         return new(name, varDeclarations);
     }
 
@@ -308,7 +308,8 @@ public class Parser
     private CallExpression FinishCall(Expression expression)
     {
         List<Expression> arguments = [];
-    
+        Token paren = Previous();
+
         if (!Check(TokenType.ParenRight))
             do
             {
@@ -319,7 +320,7 @@ public class Parser
             }
             while (Match(TokenType.Comma));
     
-        Token paren = Expect(TokenType.ParenRight, "')' expected after function arguments.");
+        Expect(TokenType.ParenRight, "\")\" expected after function arguments.");
 
         return new CallExpression(expression, paren, arguments);
     }
