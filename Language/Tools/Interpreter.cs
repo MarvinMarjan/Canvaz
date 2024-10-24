@@ -105,7 +105,7 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
 
     public object? ProcessStructureDeclarationStatement(StructureDeclarationStatement statement)
     {
-        Environment.Structures.Add(statement.Name.Lexeme, statement);
+        Environment.AddStructure(statement.Name.Lexeme, statement);
 
         return null;
     }
@@ -276,12 +276,12 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     {
         Token structureName = expression.StructureName;
 
-        if (!Environment.Structures.TryGetValue(expression.StructureName.Lexeme, out StructureDeclarationStatement? structureDeclaration))
+        if (!Environment.TryGetStructure(expression.StructureName.Lexeme, out StructureDeclarationStatement? structureDeclaration))
             throw NewError($"Structure \"{structureName.Lexeme}\" is not defined.", structureName);
 
         Structure structure = new(structureName.Lexeme);
 
-        foreach (var (name, varDeclaration) in structureDeclaration.Members)
+        foreach (var (name, varDeclaration) in structureDeclaration!.Members)
         {
             if (!expression.InitializationPairs.TryGetValue(name, out StructureInitializationPair init))
             {

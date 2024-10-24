@@ -32,6 +32,15 @@ public class Environment
     }
 
 
+    public void AddStructure(string name, StructureDeclarationStatement declaration)
+    {
+        if (ExistsStructure(name))
+            throw NewError($"Structure \"{name}\" has already been defined.");
+
+        Structures.Add(name, declaration);
+    }
+
+
     public Type Get(string name)
     {
         if (_data.TryGetValue(name, out Type? value))
@@ -41,6 +50,18 @@ public class Environment
             return Enclosing.Get(name);
 
         throw NewError($"Undefined identifier \"{name}\"");
+    }
+
+
+    public StructureDeclarationStatement GetStructure(string name)
+    {
+        if (Structures.TryGetValue(name, out StructureDeclarationStatement? structure))
+            return structure;
+
+        if (Enclosing is not null)
+            return Enclosing.GetStructure(name);
+
+        throw NewError($"Undefined structure \"{name}\"");
     }
 
 
@@ -59,6 +80,21 @@ public class Environment
     }
 
 
+    public bool TryGetStructure(string name, out StructureDeclarationStatement? structure)
+    {
+        try
+        {
+            structure = GetStructure(name);
+            return true;
+        }
+        catch
+        {
+            structure = null;
+            return false;
+        }
+    }
+
+
     public void Set(string name, object? newValue)
     {
         Type value = Get(name);
@@ -69,6 +105,10 @@ public class Environment
 
     public bool Exists(string name)
         => _data.ContainsKey(name);
+
+    
+    public bool ExistsStructure(string name)
+        => Structures.ContainsKey(name);
 
 
     private static CanvazLangException NewError(string msg)

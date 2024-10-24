@@ -18,15 +18,22 @@ structure Person
     }
 }
 
+function Person(name: String, age: Integer): Person {
+    return Person{ name: name, age: age }
+}
+
 
 var peter = Person{
     age: 24,
     name: "Peter Parker"
 }
 
+var marvin = Person("Marvin Marjan", 15)
+
 
 var myfunc = function(text: String) {
     print text
 }
 
-peter.name->show()
+peter->show()
+marvin->show()
