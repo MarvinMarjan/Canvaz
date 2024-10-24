@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Canvaz.Language.Definitions;
+using Canvaz.Language.Definitions.Typing;
 using Canvaz.Language.Exceptions;
 
 
@@ -63,6 +64,7 @@ public class Parser
         if (tokenType == TokenType.If) return IfElseStatement();
         if (tokenType == TokenType.While) return WhileStatement();
         if (tokenType == TokenType.BraceLeft) return new BlockStatement(Block());
+        if (tokenType == TokenType.Return) return ReturnStatement();
 
         Retreat();
         return ExpressionStatement();
@@ -109,7 +111,7 @@ public class Parser
         
         Expect(TokenType.ParenLeft, "Expect \"(\" after fuction name.");
 
-        List<Token> parameters = [];
+        List<VarDeclarationStatement> parameters = [];
         
         if (!Check(TokenType.ParenRight))
             do
@@ -117,15 +119,25 @@ public class Parser
                 if (parameters.Count >= 32)
                     throw NewError("Can't have more than 32 parameters.");
 
-                parameters.Add(Expect(TokenType.Identifier, "Expect parameter."));
+                parameters.Add(VarDeclarationStatement());
             } while (Match(TokenType.Comma));
+
+        for (int i = 0; i < parameters.Count; i++)
+            if (parameters[i].Value is not null && i + 1 < parameters.Count)
+                throw NewError("Parameters with default value must be at the end of a parameter list.", parameters[i].Name);
         
         Expect(TokenType.ParenRight, "Expect \")\" after parameters.");
+
+        Token? returnType = null;
+
+        if (Match(TokenType.Colon))
+            returnType = Expect(TokenType.Identifier, "Expect return type after \":\".");
+
         Expect(TokenType.BraceLeft, "Expect \"{\" before function body.");
 
         List<Statement> body = Block();
 
-        return new(name, parameters, body);
+        return new(name, parameters, returnType, body);
     }
 
 
@@ -166,6 +178,15 @@ public class Parser
         Statement statement = Statement();
 
         return new(condition, statement);
+    }
+
+
+    private ReturnStatement ReturnStatement()
+    {
+        Token keyword = Previous();
+        Expression value = Expression();
+
+        return new(keyword, value);
     }
 
 

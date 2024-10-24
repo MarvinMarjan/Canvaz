@@ -1,9 +1,9 @@
-#< var myrect = Rectangle {
+#< var myrect = Rectangle{
     NameId: "MyRect",
-    Position: Vec2f(100.123, 200f),
-    Size: Vec2f(100f, 100f)
+    Position: Vec2f{100.123, 200f},
+    Size: Vec2f{100f, 100}
     Rotation: 0f,
-    Color: RGB(255, 0, 255),
+    Color: RGB{255, 0, 255},
 } >#
 
 
@@ -14,9 +14,8 @@ structure Person
 }
 
 
-function greet(name) {
-    print "Hello, " + name + "!"
+var marvin = Person{"Marvin Marjan", 15}
+var peter = Person{
+    age: 24,
+    name: "Peter Parker"
 }
-
-
-print "hello, world"()

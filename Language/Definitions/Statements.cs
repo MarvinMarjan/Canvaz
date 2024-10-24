@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Net.Mime;
+using Canvaz.Language.Definitions.Typing;
 
 
 namespace Canvaz.Language.Definitions;
@@ -11,6 +13,7 @@ public interface IStatementProcessor<T>
     public T ProcessPrintStatement(PrintStatement statement);
     public T ProcessVarDeclarationStatement(VarDeclarationStatement statement);
     public T ProcessFunctionDeclarationStatement(FunctionDeclarationStatement statement);
+    public T ProcessReturnStatement(ReturnStatement statement);
     public T ProcessStructureDeclarationStatement(StructureDeclarationStatement statement);
     public T ProcessIfElseStatement(IfElseStatement statement);
     public T ProcessWhileStatement(WhileStatement statement);
@@ -65,15 +68,27 @@ public class VarDeclarationStatement(Token name, Token? typeName, Expression? va
 }
 
 
-public class FunctionDeclarationStatement(Token name, List<Token> parameters, List<Statement> body) : Statement
+public class FunctionDeclarationStatement(Token name, List<VarDeclarationStatement> parameters, Token? returnType, List<Statement> body) : Statement
 {
     public Token Name { get; init; } = name;
-    public List<Token> Parameters { get; init; } = parameters;
+    public List<VarDeclarationStatement> Parameters { get; init; } = parameters;
+    public Token? ReturnType { get; init; } = returnType;
     public List<Statement> Body { get; init; } = body;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)
         => processor.ProcessFunctionDeclarationStatement(this);
+}
+
+
+public class ReturnStatement(Token keyword, Expression value) : Statement
+{
+    public Token Keyword { get; init; } = keyword;
+    public Expression Value { get; init; } = value;
+
+
+    public override T Process<T>(IStatementProcessor<T> processor)
+        => processor.ProcessReturnStatement(this);
 }
 
 

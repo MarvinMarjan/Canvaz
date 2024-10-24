@@ -10,7 +10,7 @@ namespace Canvaz.Language.Definitions.Typing;
 public class TypeName
 {
     public static string[] Primitives { get; private set; } = [
-        "String", "Boolean", "Float", "Integer", "UInteger", "Function"
+        "Any", "String", "Boolean", "Float", "Integer", "UInteger", "Function"
     ];
 
 
@@ -27,13 +27,6 @@ public class TypeName
         }
     }
 
-    public bool Null { get; set; }
-
-
-    public TypeName()
-    {
-        Null = true;
-    }
 
     public TypeName(string name)
     {
@@ -49,7 +42,7 @@ public class TypeName
 
 
     public bool Equals(TypeName other)
-        => Name == other.Name;
+        => Name == other.Name || Name == "Any" || other.Name == "Any";
 
     public override bool Equals(object? obj)
         => obj is TypeName typeName && Equals(typeName);
@@ -58,7 +51,7 @@ public class TypeName
         => Name.Length * Name.Length;
 
     public override string ToString()
-        => Null ? "Null" : Name;
+        => Name;
 
 
 
@@ -75,10 +68,8 @@ public class TypeName
     }
 
 
-    public static TypeName FromValue(object? value) => value switch
+    public static TypeName FromValue(object value) => value switch
     {
-        null => new(),
-
         string => new("String"),
         bool => new("Boolean"),
 

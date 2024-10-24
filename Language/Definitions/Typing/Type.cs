@@ -18,30 +18,22 @@ public partial class Type
                 return;
             }
 
-            TypeName newTypeName = TypeName.FromValue(value);
+            TypeName newTypeName = TypeName.Name == "Any" ? new("Any") : TypeName.FromValue(value);
 
-            if (StaticTyping && newTypeName != TypeName)
-                throw NewError($"Can't assign a static typed variable of type \"{TypeName}\" a value of type \"{newTypeName}\".");
+            if (newTypeName != TypeName)
+                throw NewError($"Can't convert from \"{newTypeName}\" to \"{TypeName}\".");
 
             TypeName = newTypeName;
             _value = value;
         }
     }
 
-    public TypeName TypeName { get; private set; } = new();
-    public bool StaticTyping { get; set; }
+    public TypeName TypeName { get; private set; }
 
 
-    public Type(object? value)
+    public Type(object? value, TypeName? type = null)
     {
-        StaticTyping = false;
-        Value = value;
-    }
-
-    public Type(object? value, TypeName type)
-    {
-        StaticTyping = true;
-        TypeName = type;
+        TypeName = type ?? new("Any");
         Value = value;
     }
 
@@ -53,7 +45,7 @@ public partial class Type
             TokenType.Null => null,
 
             _ => null
-        }) { StaticTyping = true };
+        });
 
 
     public override string ToString()

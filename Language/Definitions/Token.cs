@@ -34,7 +34,7 @@ public enum TokenType
     Typeof,
     Print,
     Var, Function, Structure,
-    If, Else, While,
+    If, Else, While, Return
 }
 
 
@@ -57,6 +57,9 @@ public readonly struct TokenRange
     public TokenRange(Token token)
         : this(token, token)
     {}
+
+
+    public static implicit operator TokenRange(Token token) => new(token);
 }
 
 
@@ -77,6 +80,7 @@ public readonly struct Token(string lexeme, int start, int end, int line, TokenT
         new("if", TokenType.If),
         new("else", TokenType.Else),
         new("while", TokenType.While),
+        new("return", TokenType.Return),
     ]);
 
 

@@ -130,6 +130,10 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
     }
 
 
+    public object? ProcessReturnStatement(ReturnStatement statement)
+        => throw new Return(Interpret(statement.Value), statement.Keyword);
+
+
 
 
     public Type ProcessLiteralExpression(LiteralExpression expression)
