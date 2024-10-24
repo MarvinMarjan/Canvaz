@@ -24,7 +24,7 @@ public enum TokenType
 
     ParenLeft, ParenRight, BracketLeft, BracketRight, BraceLeft, BraceRight,
 
-    Colon, Comma, Quote,
+    Colon, Dot, Comma, Quote,
 
     String, True, False, Null,
     FloatNumber, IntegerNumber, UIntegerNumber,

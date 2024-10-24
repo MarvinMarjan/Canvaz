@@ -93,15 +93,19 @@ public class Parser
     {
         Token name = Expect(TokenType.Identifier, "Variable name expected.");
         Token? typeName = null;
+        Token? equalSign = null;
         Expression? value = null;
 
         if (Match(TokenType.Colon))
             typeName = Expect(TokenType.Identifier, "Type name expected.");
 
         if (Match(TokenType.Equal))
+        {
+            equalSign = Previous();
             value = Expression();
+        }
 
-        return new(name, typeName, value);
+        return new(name, typeName, equalSign, value);
     }
 
 
@@ -144,14 +148,15 @@ public class Parser
     private StructureDeclarationStatement StructureDeclarationStatement()
     {
         Token name = Expect(TokenType.Identifier, "Structure name expected.");
-        List<VarDeclarationStatement> varDeclarations = [];
+        Dictionary<string, VarDeclarationStatement> varDeclarations = [];
 
         Expect(TokenType.BraceLeft, "Expect \"{\" after structure name.");
 
         while (!Check(TokenType.BraceRight) && !AtEnd())
         {
             Advance();
-            varDeclarations.Add(VarDeclarationStatement());
+            VarDeclarationStatement varDeclaration = VarDeclarationStatement();
+            varDeclarations.Add(varDeclaration.Name.Lexeme, varDeclaration);
         }
 
         Expect(TokenType.BraceRight, "Expect \"}\" after structure body.");
@@ -214,6 +219,9 @@ public class Parser
                 Token name = identifierExpression.Identifier;
                 return new AssignmentExpression(name, equal, value);
             }
+
+            else if (expression is GetExpression getExpression)
+                return new SetExpression(getExpression.Object, getExpression.Member, equal, value);
 
             throw NewError("Can't assign a non-variable value.", equal);
         }
@@ -318,6 +326,10 @@ public class Parser
         {
             if (Match(TokenType.ParenLeft))
                 expression = FinishCall(expression);
+
+            else if (Match(TokenType.Dot))
+                expression = ParseGetExpression(expression);
+
             else
                 break;
         }
@@ -354,12 +366,38 @@ public class Parser
             return new LiteralExpression(Previous().Value);
 
         if (Match(TokenType.Identifier))
-            return new IdentifierExpression(Previous());
+        {
+            Token identifier = Previous();
+
+            if (Match(TokenType.BraceLeft))
+                return ParseStructureInitializationList(identifier);
+
+            return new IdentifierExpression(identifier);
+        }
 
         if (Match(TokenType.ParenLeft))
             return ParseGroupingExpression();
 
         throw NewError("Expression expected.", AtEnd() ? Previous() : Peek());
+    }
+
+
+    private StructureInitializationExpression ParseStructureInitializationList(Token structureName)
+    {
+        Dictionary<string, StructureInitializationPair> initializationPairs = [];
+
+        do
+        {
+            Token name = Expect(TokenType.Identifier, "Expect structure member name.");
+            Expect(TokenType.Colon, "Expect \":\" after structure member name.");
+            Expression value = Expression();
+
+            initializationPairs.Add(name.Lexeme, new(name, value));
+        } while (Match(TokenType.Comma));
+
+        Expect(TokenType.BraceRight, "Expect \"}\" after structure member initialization list.");
+
+        return new StructureInitializationExpression(structureName, initializationPairs);
     }
 
 
@@ -371,6 +409,13 @@ public class Parser
         Expect(TokenType.ParenRight, "Unclosed parenthesis.", start);
 
         return new GroupingExpression(expression);
+    }
+
+
+    private GetExpression ParseGetExpression(Expression @object)
+    {
+        Token member = Expect(TokenType.Identifier, "Expect member after \".\".");
+        return new GetExpression(@object, member);
     }
 
 
@@ -391,6 +436,7 @@ public class Parser
                 case TokenType.If:
                 case TokenType.Else:
                 case TokenType.While:
+                case TokenType.Return:
                     return;
             }
 
@@ -456,7 +502,7 @@ public class Parser
     }
 
     private Token Peek()
-        => _tokens[_current];
+        => AtEnd() ? Previous() : _tokens[_current];
 
     private Token Next()
         => _tokens[_current + 1];

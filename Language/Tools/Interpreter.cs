@@ -82,6 +82,8 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         Type variable;
         object? value = statement.Value is Expression validValue ? Interpret(validValue).Value : null;
 
+        CanvazLanguage.CurrentRuntimeTokenReference = statement.EqualSign;
+
         if (statement.TypeName is Token typeName)
             variable = new(value, new(typeName.Lexeme));
         else
@@ -206,15 +208,19 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
         {
             TokenType.Minus => -right,
             TokenType.Not => !right,
-            TokenType.Typeof => new(right.TypeName.ToString()),
+            TokenType.Typeof => new(right.CurrentValueTypeName()),
             
             _ => throw NewError("Invalid unary expression.", expression.Operator),
         };
     }
 
+
+    // TODO: improve token tracking system.
+
     
     public Type ProcessGroupingExpression(GroupingExpression expression)
         => Interpret(expression.Expression);
+
 
     public Type ProcessCallExpression(CallExpression expression)
     {
@@ -230,6 +236,59 @@ public class Interpreter : IExpressionProcessor<Type>, IStatementProcessor<objec
             throw NewError($"Expected {function.Arity} arguments, got {arguments.Count}.");
 
         return function.Call(this, arguments);
+    }
+
+
+    public Type ProcessGetExpression(GetExpression expression)
+    {
+        if (Interpret(expression.Object).Value is not Structure structure)
+            throw NewError("Can't use \".\" with a non-structure value.");
+
+        if (!structure.Members.TryGetValue(expression.Member.Lexeme, out Type? value))
+            throw NewError($"Member \"{expression.Member.Lexeme}\" not defined.", expression.Member);
+
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.Member;
+
+        return value;
+    }
+
+
+    public Type ProcessSetExpression(SetExpression expression)
+    {
+        if (Interpret(expression.Object).Value is not Structure structure)
+            throw NewError("Can't use \".\" with a non-structure value.");
+
+        if (!structure.Members.TryGetValue(expression.Member.Lexeme, out _))
+            throw NewError($"Member \"{expression.Member.Lexeme}\" not defined.", expression.Member);
+
+        CanvazLanguage.CurrentRuntimeTokenReference = expression.EqualSign;
+
+        Type value = Interpret(expression.Value);
+        Type member = structure.Members[expression.Member.Lexeme];
+        member.Value = value.Value;
+
+        return member;
+    }
+
+
+    public Type ProcessStructureInitializationExpression(StructureInitializationExpression expression)
+    {
+        Token structureName = expression.StructureName;
+
+        if (!Environment.Structures.TryGetValue(expression.StructureName.Lexeme, out StructureDeclarationStatement? structureDeclaration))
+            throw NewError($"Structure \"{structureName.Lexeme}\" is not defined.", structureName);
+
+        Structure structure = new(structureName.Lexeme);
+        
+        foreach (var (name, varDeclaration) in structureDeclaration.Members)
+        {
+            if (!expression.InitializationPairs.TryGetValue(name, out StructureInitializationPair init))
+                throw NewError($"Structure member \"{name}\" must be initialized.", structureName);
+
+            structure.Members.Add(name, new(Interpret(init.Value).Value, new(varDeclaration.TypeName?.Lexeme ?? "Any")));
+        }
+
+        return new(structure);
     }
 
 

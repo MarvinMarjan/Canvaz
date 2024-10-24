@@ -56,10 +56,11 @@ public class PrintStatement(Expression value) : Statement
 }
 
 
-public class VarDeclarationStatement(Token name, Token? typeName, Expression? value) : Statement
+public class VarDeclarationStatement(Token name, Token? typeName, Token? equalSign, Expression? value) : Statement
 {
     public Token Name { get; init; } = name;
     public Token? TypeName { get; init; } = typeName;
+    public Token? EqualSign { get; init; } = equalSign;
     public Expression? Value { get; init; } = value;
 
 
@@ -92,10 +93,10 @@ public class ReturnStatement(Token keyword, Expression value) : Statement
 }
 
 
-public class StructureDeclarationStatement(Token name, List<VarDeclarationStatement> members) : Statement
+public class StructureDeclarationStatement(Token name, Dictionary<string, VarDeclarationStatement> members) : Statement
 {
     public Token Name { get; init; } = name;
-    public List<VarDeclarationStatement> Members { get; init; } = members;
+    public Dictionary<string, VarDeclarationStatement> Members { get; init; } = members;
 
 
     public override T Process<T>(IStatementProcessor<T> processor)

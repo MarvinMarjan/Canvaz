@@ -1,4 +1,5 @@
 using Canvaz.Language.Exceptions;
+using Canvaz.Language.Tools;
 
 
 namespace Canvaz.Language.Definitions.Typing;
@@ -50,14 +51,31 @@ public partial class Type
 
     public override string ToString()
     {
-        string text = TypeName.Name switch {
-            "Function" => $"Function \"{(Value as Function)!.Declaration.Name.Lexeme}\"",
+        string text = Value?.ToString() ?? "null";
+        string typeName = CurrentValueTypeName();
 
-            _ => Value?.ToString() ?? "null"
-        };
+        if (Interpreter.Current!.Environment.Structures.ContainsKey(typeName))
+            text = $"Structure \"{typeName}\"";
+
+        if (typeName == "Function")
+            text = $"Function \"{(Value as Function)!.Declaration.Name.Lexeme}\"";
+
         text = text is "True" or "False" ? text.ToLower() : text; // booleans should be on lower case.
 
         return text;
+    }
+
+
+    public string CurrentValueTypeName()
+    {
+        if (Value is null)
+            return TypeName.Name;
+
+        // tell the current type instead of "Any"
+        if (TypeName.Name == "Any")
+            return TypeName.FromValue(Value).Name;
+
+        return TypeName.Name;
     }
 
 

@@ -14,8 +14,10 @@ structure Person
 }
 
 
-var marvin = Person{"Marvin Marjan", 15}
 var peter = Person{
     age: 24,
     name: "Peter Parker"
 }
+
+
+peter.asd = 1

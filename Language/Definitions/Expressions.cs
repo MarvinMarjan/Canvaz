@@ -15,6 +15,9 @@ public interface IExpressionProcessor<T>
     public T ProcessUnaryExpression(UnaryExpression expression);
     public T ProcessGroupingExpression(GroupingExpression expression);
     public T ProcessCallExpression(CallExpression expression);
+    public T ProcessGetExpression(GetExpression expression);
+    public T ProcessSetExpression(SetExpression expression);
+    public T ProcessStructureInitializationExpression(StructureInitializationExpression expression);
 }
 
 
@@ -99,3 +102,39 @@ public class CallExpression(Expression callee, Token paren, List<Expression> arg
     public override T Process<T>(IExpressionProcessor<T> processor)
         => processor.ProcessCallExpression(this);
 }
+
+
+public class GetExpression(Expression @object, Token member) : Expression
+{
+    public Expression Object { get; init; } = @object;
+    public Token Member { get; init; } = member;
+
+
+    public override T Process<T>(IExpressionProcessor<T> processor)
+        => processor.ProcessGetExpression(this);
+}
+
+
+public class SetExpression(Expression @object, Token member, Token equalSign, Expression value) : Expression
+{
+    public Expression Object { get; init; } = @object;
+    public Token Member { get; init; } = member;
+    public Token EqualSign { get; init; } = equalSign;
+    public Expression Value { get; init; } = value;
+
+
+    public override T Process<T>(IExpressionProcessor<T> processor)
+        => processor.ProcessSetExpression(this);
+}
+
+
+public class StructureInitializationExpression(Token structureName, Dictionary<string, StructureInitializationPair> initializationPairs) : Expression
+{
+    public Token StructureName { get; init; } = structureName;
+    public Dictionary<string, StructureInitializationPair> InitializationPairs { get; init; } = initializationPairs;
+
+
+    public override T Process<T>(IExpressionProcessor<T> processor)
+        => processor.ProcessStructureInitializationExpression(this);
+}
+

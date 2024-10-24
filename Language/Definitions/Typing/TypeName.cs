@@ -79,7 +79,7 @@ public class TypeName
 
         Function => new($"Function"),
 
-        StructureDeclarationStatement structure => new(structure.Name.Lexeme),
+        Structure structure => new(structure.Name),
 
         _ => throw InvalidType(value.GetType().Name)
     };

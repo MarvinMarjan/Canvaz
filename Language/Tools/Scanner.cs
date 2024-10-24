@@ -96,6 +96,7 @@ public class Scanner
         case '}': AddToken(TokenType.BraceRight); break;
 
         case ':': AddToken(TokenType.Colon); break;
+        case '.': AddToken(TokenType.Dot); break;
         case ',': AddToken(TokenType.Comma); break;
 
         case '"': String(); break;

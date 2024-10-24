@@ -4,7 +4,11 @@ using System.Collections.Generic;
 namespace Canvaz.Language.Definitions.Typing;
 
 
-public class Structure
+public class Structure(string name)
 {
-    public List<Type> Members { get; init; } = [];
+    public string Name { get; set; } = name;
+    public Dictionary<string, Type> Members { get; init; } = [];
 }
+
+
+public record struct StructureInitializationPair(Token Name, Expression Value);
